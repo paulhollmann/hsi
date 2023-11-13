@@ -308,6 +308,7 @@ public class JOCLSimpleImage
     /**
      * Initialize the memory objects for the input and output images
      */
+    @SuppressWarnings("deprecation")
     private void initImageMem()
     {
         // Create the memory object for the input- and output image
