@@ -3,6 +3,7 @@
 M2_HOME=~/mvn
 MAVEN_URL=https://mirrors.estointernet.in/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
 MAVEN_ARCHIVE=apache-maven-3.6.3-bin
+MAVEN_EXTR=apache-maven-3.6.3
 
 # Check if ~/mvn/ exists
 if [ ! -d "$M2_HOME" ]; then
@@ -14,7 +15,7 @@ if [ ! -d "$M2_HOME" ]; then
     tar -xvf "$MAVEN_ARCHIVE".tar.gz
 
     # Move Maven to ~/mvn
-    mv "$MAVEN_ARCHIVE" "$M2_HOME"
+    mv "$MAVEN_EXTR" "$M2_HOME"
 
     # Clean up downloaded archive
     rm "$MAVEN_ARCHIVE".tar.gz
