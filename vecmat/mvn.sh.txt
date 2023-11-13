@@ -1,0 +1,9 @@
+
+# git reset pull and make marven exec
+
+git reset --hard && git pull && chmod a+x mvn.sh
+
+
+# download marven and run package to make a jar
+./mvn.sh clean package
+
