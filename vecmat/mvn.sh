@@ -1,9 +1,8 @@
 #!/bin/bash
 
 M2_HOME=~/mvn
-MAVEN_VERSION=3.6.3
-MAVEN_URL=https://mirrors.estointernet.in/apache/maven/maven-${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
-MAVEN_ARCHIVE=apache-maven-${MAVEN_VERSION}-bin.tar.gz
+MAVEN_URL=https://mirrors.estointernet.in/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+MAVEN_ARCHIVE=apache-maven-3.6.3-bin
 
 # Check if ~/mvn/ exists
 if [ ! -d "$M2_HOME" ]; then
@@ -12,13 +11,13 @@ if [ ! -d "$M2_HOME" ]; then
     wget "$MAVEN_URL"
 
     # Extract Maven
-    tar -xvf "$MAVEN_ARCHIVE"
+    tar -xvf "$MAVEN_ARCHIVE".tar.gz
 
     # Move Maven to ~/mvn
-    mv apache-maven-"$MAVEN_VERSION" "$M2_HOME"
+    mv "$MAVEN_ARCHIVE" "$M2_HOME"
 
     # Clean up downloaded archive
-    rm "$MAVEN_ARCHIVE"
+    rm "$MAVEN_ARCHIVE".tar.gz
 
     echo "Apache Maven installed successfully!"
 fi
