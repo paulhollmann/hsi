@@ -8,7 +8,22 @@
 	<packaging>jar</packaging>
 
 	<build>
+		<defaultGoal>clean package</defaultGoal>
 		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>de.hsi.vecmat.Main</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -40,11 +55,13 @@
 			<groupId>org.jocl</groupId>
 			<artifactId>jocl</artifactId>
 			<version>2.0.4</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jocl</groupId>
 			<artifactId>jocl-blast</artifactId>
 			<version>1.5.0</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>
