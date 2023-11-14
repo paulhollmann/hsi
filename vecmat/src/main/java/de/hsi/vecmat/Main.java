@@ -1,5 +1,7 @@
 package de.hsi.vecmat;
 
+import org.jocl.samples.JOCLDeviceQuery;
+
 public class Main {
 
     public static void main(String[] args)
@@ -9,6 +11,8 @@ public class Main {
         var result = getMatVecProd(mat, vec);
 
         System.out.println(result[0] + result[1] + result[2]);
+
+        JOCLDeviceQuery.main(args);
     }
 
     /* Size double mat needs to be square double size(vec)
