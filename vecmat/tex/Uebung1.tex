@@ -1,0 +1,125 @@
+% !TeX program = lualatex
+
+\documentclass[
+ngerman,
+subtask=ruled %or plain
+]{tudaexercise}
+
+\usepackage[english, main=ngerman]{babel}
+\usepackage[autostyle]{csquotes}
+
+\usepackage{amsmath,amssymb}
+
+\usepackage{float}
+
+\usepackage{biblatex}
+%\bibliography{DEMO-TUDaBibliography}
+
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\e}{\mathrm{e}}
+
+
+\ConfigureHeadline{
+	headline={HSI Übung - Niklas Beck und Paul Hollmann}
+}
+
+\begin{document}
+	
+	\title[Übung Hochleistungssimulationen]{Hochleistungssimulationen}
+	\subtitle{\"Ubung 1}
+	\author{Niklas Beck (2582775), Paul Hollmann (2465070)}
+	\term{Wintersemester 2023/24}
+	%\sheetnumber{1}
+	\date{Abgabe 26. November 2023}
+	\maketitle
+	
+	
+	\begin{task}{Decomposition Patterns}
+		\begin{subtask}[title=]
+			Insgesamt fallen 5 Stunden waschen, 5 Stunden trocknen und 5 Stunden bügeln an, welche nicht parallel laufen können.
+			Damit addiert es sich auf 15 Stunden sequenzielle Arbeit.
+		\end{subtask}
+		\begin{subtask}[title=]
+			Per Data decomposition könnte jeder Freund eine Ladung (solange nicht weiter teilbar;) der Wäsche erhalten.
+			Da alle dann gleichzeitig waschen, trocknen und bügeln können, braucht der Arbeitsgang nur noch min. 3 Stunden.
+		\end{subtask}
+		\begin{subtask}[title=]
+			Im optimaleren, parallelen Workflow den man alleine durchführen kann, würde task decomposition verwendet werden.
+			Da trotzdem die Wäsche zuerst gewaschen werden muss, entstehen wie beim Pipeline pattern am Anfang und am Ende Aufgaben für einen Teil der Arbeit, während zwischendrin sowohl Waschmaschine als auch Trockner laufen können und ich gleichzeitig bügeln kann.
+			Folie 41 aus Foliensatz 11 zeigt diesen Arbeitsgang ganz gut, in diesem Beispiel ist es nur eine Stage weniger, welche zur Aufteilung benötigt wird.
+			Aus der Grafik lässt sich damit erkennen, das sich die Wäsche in 7 Stunden machen ließe.
+		\end{subtask}
+	\end{task}
+	
+	
+	\begin{task}{Kommunikationsschema}
+		\begin{subtask}[title=]
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=.4\linewidth]{2a.png}
+			\end{figure}
+			Die Zahlen stellen die Reihenfolge der (parallel) verlaufenden Operationen, die Buchstaben die ausgeführte (Art/Typ der) Operation und die (fetten) Kreise die beteiligten Partner dar.
+			Für die gesamte Laufzeit ergibt sich dann
+			\begin{align}
+				T_\text{circ} &= t_c + t_a + t_c + t_a + t_c + t_a + t_c + t_a \\
+				&= 4 (t_a + t_c).
+			\end{align}
+		\end{subtask}
+		\begin{subtask}[title=]
+			\begin{figure}[H]
+				\centering
+				\includegraphics[width=.4\linewidth]{2b.png}
+			\end{figure}
+			Die Zahlen stellen die Reihenfolge der (parallel) verlaufenden Operationen, die Buchstaben die ausgeführte (Art/Typ der) Operation und die (fetten) Kreise die beteiligten Partner dar.
+			Für die gesamte Laufzeit ergibt sich dann
+			\begin{align}
+				T_\text{grid} &= t_c + t_a + t_c + t_a + t_c + t_a \\
+				&= 3 (t_a + t_c).
+			\end{align}
+		\end{subtask}
+	\end{task}
+	
+	
+	\begin{task}{Speedup} 
+		\begin{subtask}[title=]
+			Nach Amdahl's Regel gilt für den Speedup
+			\begin{align}
+				S = \frac{1}{(1-f_\text{enh}) + \frac{f_\text{enh}}{S_\text{enh}}}.
+			\end{align}
+			Die Anteile der Anwendung durch Gleitpunktoperationen und deren Speedup eingesetzt liefert ein gesamtes Speedup von
+			\begin{align}
+				S_\text{GP} = \frac{1}{(1-0.6) + \frac{0.6}{1.5})} = \frac{5}{4} = 1.25 \text{.}
+			\end{align}
+			Dieser gesamte Speedup ist höher als durch Anwenden der Regel auf eine Verbesserung der Quadratwurzel-Berechnung nach
+			\begin{align}
+				S_\text{QW} = \frac{1}{(1-0.15) + \frac{0.15}{8})} = 1.15
+			\end{align}
+			abgeschätzt wird.
+			
+		\end{subtask}
+		\begin{subtask}[title=]
+			\begin{align}
+				S &= \frac{1}{f_\text{seq} + \frac{1-f_\text{seq}}{p}} \\
+				&= \frac{1}{0.1 + \frac{1-0.1}{16}} \\
+				&= 6.4
+			\end{align}
+		\end{subtask}
+		\begin{subtask}[title=]
+			\begin{align}
+				10 &= \frac{1}{f_\text{seq} + \frac{1-f_\text{seq}}{16}} \\
+				&= \frac{1}{\frac{1}{16} + f_\text{seq} - \frac{f_\text{seq}}{16}} \\
+				&= \frac{1}{\frac{1}{16} + \frac{15}{16} f_\text{seq}}
+			\end{align}
+			
+			\begin{align}
+				\frac{1}{10} &= \frac{1}{16} + \frac{15}{16} f_\text{seq}
+			\end{align}
+			
+			\begin{align}
+				f_\text{seq} &= \frac{3}{80} \frac{16}{15} = \frac{1}{25} = 0.04
+			\end{align}
+			Es müssen $96\%$ der Anwendung parallelisierbar sein, sodass der Speedup von 10 erreicht werden könnte.
+		\end{subtask}
+	\end{task}
+	
+\end{document}
