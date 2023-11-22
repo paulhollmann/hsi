@@ -1,5 +1,6 @@
 package de.hsi.vecmat;
 
+import static de.hsi.vecmat.FileFinder.readFile;
 import static org.jocl.CL.*;
 
 import java.io.BufferedReader;
@@ -111,57 +112,5 @@ public class Main {
         return result;
     }
 
-    /**
-     * Read the contents of the file with the given name, and return
-     * it as a string
-     *
-     * @param fileName The name of the file to read
-     * @return The contents of the file
-     */
-    private static String readFile(String fileName)
-    {
-        System.out.println("Searching for " + System.getProperty("user.dir") +"/"+ fileName);
-        if(!(new File(fileName)).isFile()) {
-            fileName = "src/main/resources/" + fileName;
-            System.out.println("Searching for " + System.getProperty("user.dir") + fileName);
-        }
-
-        BufferedReader br = null;
-        try
-        {
-            br = new BufferedReader(new FileReader(fileName));
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-            while (true)
-            {
-                line = br.readLine();
-                if (line == null)
-                {
-                    break;
-                }
-                sb.append(line+"\n");
-            }
-            return sb.toString();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            return "";
-        }
-        finally
-        {
-            if (br != null)
-            {
-                try
-                {
-                    br.close();
-                }
-                catch (IOException ex)
-                {
-                    ex.printStackTrace();
-                }
-            }
-        }
-    }
 
 }
