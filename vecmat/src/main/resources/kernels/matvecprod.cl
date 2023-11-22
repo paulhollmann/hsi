@@ -1,7 +1,7 @@
-__kernel void vecmat(__global const float *mat,"+
+__kernel void vecmatprod(__global const float *mat,
              __global const float *vec,
              __global float *res,
-             __global int m)
+             const uint m)
 {
     int gid = get_global_id(0);
     res[gid] = 0;

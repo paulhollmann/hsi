@@ -3,20 +3,24 @@ package de.hsi.vecmat;
 import static de.hsi.vecmat.FileFinder.readFile;
 import static org.jocl.CL.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+
+import java.util.Arrays;
 import java.util.Random;
 
 import org.jocl.*;
-import org.jocl.samples.JOCLDeviceQuery;
+
 
 public class Main {
 
     public static void main(String[] args)
     {
-        int m = 3;
+        int m = 1000;
+
+        if(args.length == 1) {
+            m = Integer.parseInt(args[0]);
+        }
+        System.out.println("Chosen problem size: m=" + m);
+
         Random r = new Random();
         var mat = new float[m*m];
         var vec = new float[m];
@@ -38,7 +42,8 @@ public class Main {
         long end = System.currentTimeMillis();
         System.out.printf("Matrix-Vektor-Produkt completed in %dms%n", end - start);
 
-        System.out.println(result[0] + " " + result[1] + " " + result[2] + " ");
+
+        System.out.println(Arrays.toString(result));
 
 
         System.out.println("-----Kernel-----");
@@ -99,7 +104,7 @@ public class Main {
                 Sizeof.cl_float * m, null, null);
 
         // Create the program from the source code
-        String programSource = readFile("kernels/reduction.cl");
+        String programSource = readFile("kernels/matvecprod.cl");
         cl_program program = clCreateProgramWithSource(context,
                 1, new String[]{ programSource }, null, null);
 
@@ -107,12 +112,13 @@ public class Main {
         clBuildProgram(program, 0, null, null, null, null);
 
         // Create the kernel
-        cl_kernel kernel = clCreateKernel(program, "reduce", null);
+        cl_kernel kernel = clCreateKernel(program, "vecmatprod", null);
 
         int a = 0;
         clSetKernelArg(kernel, a++, Sizeof.cl_mem, Pointer.to(inputMemMat));
         clSetKernelArg(kernel, a++, Sizeof.cl_mem, Pointer.to(inputMemVec));
         clSetKernelArg(kernel, a++, Sizeof.cl_mem, Pointer.to(outputMemVec));
+        clSetKernelArg(kernel, a++, Sizeof.cl_uint, Pointer.to(new int[]{m}));
 
         long[] global_work_size = new long[]{m};
         long[] local_work_size = new long[]{1};
@@ -139,9 +145,8 @@ public class Main {
         clReleaseContext(context);
 
         // Verify the result
-        System.out.println(outputArray[0] + " " + outputArray[1] + " " +outputArray[2] );
+        System.out.println(Arrays.toString(outputArray));
 
-        //JOCLDeviceQuery.main(args);
     }
 
     /* Size of double mat needs to be square double size(vec)
