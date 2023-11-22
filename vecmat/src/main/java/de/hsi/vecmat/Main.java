@@ -3,6 +3,7 @@ package de.hsi.vecmat;
 import static org.jocl.CL.*;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Random;
@@ -59,7 +60,7 @@ public class Main {
                 Sizeof.cl_float * m, Pointer.to(outputArray), null);
 
         // Create the program from the source code
-        String programSource = readFile("reduction.cl");
+        String programSource = readFile("kernels/reduction.cl");
         program = clCreateProgramWithSource(context,
                 1, new String[]{ programSource }, null, null);
 
@@ -119,6 +120,12 @@ public class Main {
      */
     private static String readFile(String fileName)
     {
+        System.out.println("Searching for " + System.getProperty("user.dir") +"/"+ fileName);
+        if(!(new File(fileName)).isFile()) {
+            fileName = "src/main/resources/" + fileName;
+            System.out.println("Searching for " + System.getProperty("user.dir") + fileName);
+        }
+
         BufferedReader br = null;
         try
         {
