@@ -19,7 +19,7 @@ module purge
 module load java
 module load cuda
 
-/home/ph84wuqa/hsi/vecmat/mvn.sh assembly:single
+/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/mvn.sh assembly:single
 
 
  # call to the parallel program
