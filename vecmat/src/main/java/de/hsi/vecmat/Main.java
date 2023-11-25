@@ -171,10 +171,13 @@ public class Main {
 
     public static boolean verify(float[] vec_a, float[] vec_b, float diff){
         boolean good = vec_a.length == vec_b.length;
+        int count = 0;
         for (int i = 0; i < vec_a.length; i++) {
             if(Math.abs(vec_a[i] - vec_b[i]) > diff) {
                 good = false;
                 System.out.println("diff at i=" + i +" of " + (vec_a[i] - vec_b[i]) );
+                count++;
+                if(count > 5) break;
             }
         }
         System.out.println("Vectors of length " + vec_b.length + " match" + (good ? "":" not") + " to " + diff);
