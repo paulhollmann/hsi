@@ -8,8 +8,8 @@ import java.io.IOException;
 public class FileFinder {
 
     static String[] paths = {
-        "./",
-        "src/main/resources/"
+            "src/main/resources/",
+            "./",
     };
 
     /**
