@@ -24,12 +24,11 @@ public class Main {
             m = Integer.parseInt(args[0]);
         }
         if(m > (int) Math.sqrt(Integer.MAX_VALUE)){
-            System.out.println("Max array size " + Integer.MAX_VALUE + " elements, so about " + (int) Math.sqrt(Integer.MAX_VALUE) + "*" + (int) Math.sqrt(Integer.MAX_VALUE) + "-> m=" +m);
             m = (int) Math.sqrt(Integer.MAX_VALUE);
+            System.out.println("Max array size " + Integer.MAX_VALUE + " elements, so about " + (int) Math.sqrt(Integer.MAX_VALUE) + "*" + (int) Math.sqrt(Integer.MAX_VALUE) + "-> m=" +m);
         }
         long max_floats = Runtime.getRuntime().maxMemory() / Float.BYTES;
         if(1.2 * m * m > max_floats){
-
             m = (int) (Math.sqrt(max_floats) / 1.2);
             System.out.println("Max mem " + Runtime.getRuntime().maxMemory() / (1024 * 1024) + " MB, so about " + max_floats + "floats -> m=" +m );
         }
