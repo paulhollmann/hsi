@@ -20,6 +20,9 @@ public class Main {
         if(args.length == 1) {
             m = Integer.parseInt(args[0]);
         }
+        if(m > (int) Math.sqrt(Integer.MAX_VALUE)){
+            m = (int) Math.sqrt(Integer.MAX_VALUE);
+        }
         System.out.println();
         System.out.println();
         System.out.println("Chosen problem size: m=" + m);
