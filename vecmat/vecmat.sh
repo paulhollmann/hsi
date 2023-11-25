@@ -19,8 +19,6 @@ module purge
 module load java
 module load cuda
 
-rm /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/target/vecmat-0.0.1-SNAPSHOT.jar
-
 /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/mvn.sh assembly:single
 
  # call to the parallel program
