@@ -3,12 +3,8 @@ package de.hsi.vecmat;
 import static de.hsi.vecmat.FileFinder.readFile;
 import static org.jocl.CL.*;
 
-
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Random;
 
-import org.jetbrains.annotations.NotNull;
 import org.jocl.*;
 
 
