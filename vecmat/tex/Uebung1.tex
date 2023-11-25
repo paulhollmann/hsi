@@ -39,7 +39,7 @@ subtask=ruled %or plain
 	
 	Erklärung als eine Versuchsbeschreibung, Versuchsvorhaben und Arbeitsschritte
 	
-	\begin{task}{Sequentielle Berechnung des Matrix-Vektor-Produkts}
+	\begin{task}{Sequentielle Berechnung des Matrix-Vektor-Produkts}\label{task:1}
 		Das Matrix-Vektor-Produkt ist eine wohl bekannte mathematische Operation, welche auch für große Matrizen gebraucht wird.
 		Um die Rechenzeit möglichst gering zu halten, sind parallele Berechnungen sinnvoll zu wählen. Insbesondere wenn gleiche Operationen auf unterschiedlichen Daten ausgeführt werden sollen, ist dies ein gutes Einstiegsbeispiel zur Nutzung von OpenCL.
 		
@@ -51,8 +51,29 @@ subtask=ruled %or plain
 	
 	\begin{task}{Parallele Berechnung des Matrix-Vektor-Produkts}
 		Noch bevor Bearbeitung der nächsten Teilaufgabe haben wir uns die Dokumentationen von OpenCL und JOCL herausgesucht und anhand der Beispiele aus dem moodle-Kurs und von JOCL ein Verständnis zur Einbindung von OpenCL-Code erlangt.
-		Dann haben wir noch auf den eigenen Rechnern einen Kernel in einer Extradatei ausgelagert, da es eine schönere Formatierung ermöglicht.
-		Dieser muss per BEFEHL in den JOCL Code eingefügt werden.
+		Dann haben wir, noch auf den eigenen Rechnern, einen Kernel in einer Extradatei ausgelagert, da es eine schönere Formatierung ermöglicht.
+		Der ganze Code im Kernel ist ein C++ Dialekt, was hier noch wenige Auswirkungen hat, aber nicht vergessen werden sollte.
+		Als Vorlage zum Kernel dient das Programm aus Aufgabe \ref{task:1}. Wichtige Ergänzungen im Funktionskopf sind hierbei zuerst einmal die Spezifikation als kernel, die Änderung von Arrays zu Pointern als auch die Angabe des Adressraums der Parameter.
+		Sinnvoll in diesem ersten Programm ist der global-Adressbereich, da hier die Variablen von host und device verwendet werden können.
+		Die Datentypen sind in diesem Fall noch die gleichen, es gibt aber zum Beispiel nicht einfach einen double Typ. Dieser scheint standardmäßig nicht auf allen Geräten verfügbar zu sein.
+		Zum Aufsplitten der Berechnung von einzelnen Spalten wird die ID der jeweiligen Threads per get\_global\_id erhalten.
+		Diese Zahl wird als Zeilennummer der Matrix und des Ergebnisses verwendet.
+		
+		Nach diesem Schritt in OpenCL-Code wird die Einbindung in den Java-Code benötigt.
+		Es muss eine platform, properties und damit ein device erstellt werden. Das JOCL Device-Object haben wir für ein paar Testdaten mal untersucht und besonders die maximale Anzahl an work\_groups ist für spätere Ziele noch relevant.
+		Ein Context wird für das Programm noch benötigt bevor der Kernel per clCreateProgramWithSource in den JOCL Code eingefügt werden kann.
+		Der C++ Code muss gebuilded werden und kann im Anschluss, durch clCreateKernel, als Kernel erstellt werden.
+		Eine Command Queue wird erschaffen, um den Kernel später für eine asynchrone Ausführung auf das Device zu schicken.
+		Etwas mehr Aufmerksamkeit mussten wir der memory object Erstellung schenken. Buffer wurden für alle Parameter und die Rückgabe erstellt und die Größe der Dateitypen sollte dazu beachtet werden.
+		Der Kernel wird mit den Buffer-Objekten und möglichen Konstanten verbunden, die Systemzeit wird einmal gemessen und dann geht es endlich zur Ausführung des Kernels:
+		$clEnqueueNDRangeKernel(commandQueue, kernel, 1, null,
+		global_work_size, n < 0 ? null: local_work_size,
+		0, null, null);$
+		Im Ausführungsbefehl können, wichtig für spätere Ziele, die work\_groups angepasst werden. Zuerst verwenden wir hier NULL, da sich OpenCL dann selbst eine geeignete Größe bestimmt.
+		%Asynchrones Ausführen ? oder nicht und funktioniert daher System.nanoTime()
+		Nach der Ausführung wird der Buffer mit dem Ergebnis gelesen und nochmal die Zeit gemessen.
+		Zu guter Letzt, immer wichtig bei der Arbeit direkt mit Speicher, müssen die Objekte freigegeben werden.
+		Mit den richtigen Timern können wir schon gleich die Zeiten der Berechnung sequentiell und parallel vergleichen.
 	\end{task}
 	
 	
