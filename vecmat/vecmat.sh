@@ -8,9 +8,9 @@
 #SBATCH -e /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/err.%j
 #SBATCH -o /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/out.%j
 
-#SBATCH --mem-per-cpu=1000
+#SBATCH --mem-per-cpu=3800
 #SBATCH --time=00:30
-#SBATCH -n 4
+#SBATCH -n 1
 
 #SBATCH --gres=gpu:v100:4
 
