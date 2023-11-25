@@ -41,15 +41,17 @@ subtask=ruled %or plain
 	
 	\begin{task}{Sequentielle Berechnung des Matrix-Vektor-Produkts}
 		Das Matrix-Vektor-Produkt ist eine wohl bekannte mathematische Operation, welche auch für große Matrizen gebraucht wird.
-		Eine kleine Eigenheit der hier verlangten Funktion ist die Eingabe nur eines Wertes $m$, welcher zur Initialisierung einer quadratischen Matrix und eines Vektors mit Zufallswerten genutzt wird.
-		Ohne Vorgabe eines Datentyps haben wir uns für den Typ float entschieden, da er einen größeren Eingabemenge ermöglicht, aber nicht allzu groß ist. Wäre die Präzision relevant, hätten wir uns eher für den double entschieden.
+		Um die Rechenzeit möglichst gering zu halten, sind parallele Berechnungen sinnvoll zu wählen. Insbesondere wenn gleiche Operationen auf unterschiedlichen Daten ausgeführt werden sollen, ist dies ein gutes Einstiegsbeispiel zur Nutzung von OpenCL.
+		
+		Als sinnvoller erster Schritt brauchen wir ein sequentielles Programm.
+		Eine kleine Eigenheit der hier verlangten Funktion ist die Eingabe nur eines Wertes $m$, welcher zur Initialisierung einer quadratischen Matrix und eines Vektors mit Zufallswerten genutzt wird. Wesentliches Ziel der Aufgabe ist es die Berechnungszeit zu untersuchen, weshalb konkrete Beispielmatrizen oder nicht-quadratische Beispiele wenig Mehrwert bieten.
+		Ohne Vorgabe eines Datentyps haben wir uns für den Typ float entschieden, da er einen größeren Eingabemenge ermöglicht, aber nicht allzu viel Speicher braucht. Wäre die Präzision relevant, hätten wir uns eher für den double entschieden.
 	\end{task}
 	
 	
 	\begin{task}{Parallele Berechnung des Matrix-Vektor-Produkts}
 		Noch bevor Bearbeitung der nächsten Teilaufgabe haben wir uns die Dokumentationen von OpenCL und JOCL herausgesucht und anhand der Beispiele aus dem moodle-Kurs und von JOCL ein Verständnis zur Einbindung von OpenCL-Code erlangt.
-		
-		Unser Kernel ist in einer Extradatei ausgelagert, da es eine schönere Formatierung ermöglicht.
+		Dann haben wir noch auf den eigenen Rechnern einen Kernel in einer Extradatei ausgelagert, da es eine schönere Formatierung ermöglicht.
 		Dieser muss per BEFEHL in den JOCL Code eingefügt werden.
 	\end{task}
 	
@@ -66,17 +68,17 @@ subtask=ruled %or plain
 			\hline
 			Problemgröße $m$ & sequenzielle Abarbeitung & OpenCL - Parallelisierung \\
 			\hline
-			10 &  &  \\
+			10 & 0.008070 ms & 0.788789 ms (0.326362 ms kernel time) \\
 			\hline
-			1000 &  &  \\
+			1000 & 11.542249 ms & 6.969872 ms (2.329117 ms kernel time) \\
 			\hline
-			2000 &  &  \\
+			2000 & 16.357809 ms & 18.217549 ms (6.386675 ms kernel time) \\
 			\hline
-			4000 &  &  \\
+			4000 & 37.825016 ms & 66.511173 ms (22.459137 ms kernel time) \\
 			\hline
-			8000 &  &  \\
+			8000 & 123.283086 ms & 247.282878 ms (78.444500 ms kernel time) \\
 			\hline
-			15000 &  &  \\
+			15000 & 409.209827 ms & 827.959536 ms (241.992205 ms kernel time) \\
 			\hline
 		\end{tabular}
 	\end{task}
