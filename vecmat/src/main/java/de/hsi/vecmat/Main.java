@@ -15,14 +15,25 @@ public class Main {
 
     public static void main(String[] args)
     {
-        int m = 1000;
+
+
+        int m = 99999999;
 
         if(args.length == 1) {
             m = Integer.parseInt(args[0]);
         }
         if(m > (int) Math.sqrt(Integer.MAX_VALUE)){
+            System.out.println("Max array size " + Integer.MAX_VALUE + " elements, so about " + (int) Math.sqrt(Integer.MAX_VALUE) + "*" + (int) Math.sqrt(Integer.MAX_VALUE) + "-> m=" +m);
             m = (int) Math.sqrt(Integer.MAX_VALUE);
         }
+        long max_floats = Runtime.getRuntime().maxMemory() / Float.BYTES;
+        if((long) 2 * m * m > max_floats){
+
+            m = (int) (Math.sqrt(max_floats) / 1.5) ;
+            System.out.println("Max mem " + Runtime.getRuntime().maxMemory() / (1024 * 1024) + " MB, so about " + max_floats + "floats -> m=" +m );
+        }
+
+
         System.out.println();
         System.out.println();
         System.out.println("Chosen problem size: m=" + m);
