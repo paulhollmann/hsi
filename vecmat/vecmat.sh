@@ -21,5 +21,7 @@ module load cuda
 
 #/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/mvn.sh assembly:single
 
+
+cd /work/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/
  # call to the parallel program
-java -jar /work/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar
