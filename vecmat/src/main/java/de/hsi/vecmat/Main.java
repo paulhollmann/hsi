@@ -15,8 +15,8 @@ public class Main {
         System.out.println("###########################################");
         System.out.println();
 
-        int m = 1;
-        int n = 1;
+        int m = 10;
+        int n = -1;
 
         if(args.length >= 1) {
             m = Integer.parseInt(args[0]);
@@ -33,10 +33,13 @@ public class Main {
             m = (int) (Math.sqrt(max_floats) / 1.2);
             System.out.println("Max mem " + Runtime.getRuntime().maxMemory() / (1024 * 1024) + " MB, so about " + max_floats + "floats -> m=" +m );
         }
+        long[] global_work_size = new long[]{m};
+        long[] local_work_size = new long[]{n};
+        if(n>0){
+            global_work_size = new long[]{m%n == 0 ? m : (m/n + 1) * n};
+        }
+        System.out.println("Chosen problem size: m=" + m + " with in local_work_size=" + (n >0 ? n : "auto") + " and global_work_size=" + global_work_size[0]);
 
-
-
-        System.out.println("Chosen problem size: m=" + m + " with in local_work_size=" + n);
         System.out.println();
 
         Random r = new Random();
@@ -151,15 +154,12 @@ public class Main {
 
 
 
-        long[] global_work_size = new long[]{m};
-        long[] local_work_size = new long[]{n};
-
         cl_event events[] = new cl_event[] { new cl_event() }; // JOCL: Create an event!
 
         // Execute the kernel
         long before_kernel = System.nanoTime();
         clEnqueueNDRangeKernel(commandQueue, kernel, 1, null,
-                global_work_size, local_work_size,
+                global_work_size, n < 0 ? null: local_work_size,
                 0, null, null);
 
         //clWaitForEvents(1, events); // JOCL: wait for the event!
