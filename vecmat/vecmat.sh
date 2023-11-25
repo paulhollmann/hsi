@@ -3,7 +3,7 @@
 #SBATCH -A kurs00069
 #SBATCH -p kurs00069
 #SBATCH --reservation=kurs00069
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=ERR
 #SBATCH --mail-user=paul.hollmann@stud.tu-darmstadt.de
 #SBATCH -e /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/err.%j
 #SBATCH -o /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/out.%j

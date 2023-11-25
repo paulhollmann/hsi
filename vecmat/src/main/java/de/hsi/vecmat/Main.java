@@ -7,6 +7,7 @@ import static org.jocl.CL.*;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
 import org.jocl.*;
 
 
@@ -19,7 +20,10 @@ public class Main {
         if(args.length == 1) {
             m = Integer.parseInt(args[0]);
         }
+        System.out.println();
+        System.out.println();
         System.out.println("Chosen problem size: m=" + m);
+        System.out.println();
 
         Random r = new Random();
         var mat = new float[m*m];
@@ -37,31 +41,30 @@ public class Main {
 
         System.out.println("-----Host-----");
 
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         var result = getMatVecProd(mat, vec);
-        long end = System.currentTimeMillis();
-        System.out.printf("Matrix-Vektor-Produkt completed in %dms%n", end - start);
+        long end = System.nanoTime();
+        double time = (double)(end-start) / 1e6;
+        System.out.printf("completed in %f ms %n", time);
 
 
-        System.out.println(Arrays.toString(result));
 
-
-        System.out.println("-----Kernel-----");
-
+        System.out.println("-----Device-----");
+        long before_device = System.nanoTime();
         final int platformIndex = 0;
         final long deviceType = CL_DEVICE_TYPE_ALL;
         final int deviceIndex = 0;
 
         // Enable exceptions and subsequently omit error checks in this sample
-        CL.setExceptionsEnabled(true); //TODO DISABLE ERROR LOGGING
+        CL.setExceptionsEnabled(false); //TODO DISABLE ERROR LOGGING
 
         // Obtain the number of platforms
-        int numPlatformsArray[] = new int[1];
+        int[] numPlatformsArray = new int[1];
         clGetPlatformIDs(0, null, numPlatformsArray);
         int numPlatforms = numPlatformsArray[0];
 
         // Obtain a platform ID
-        cl_platform_id platforms[] = new cl_platform_id[numPlatforms];
+        cl_platform_id[] platforms = new cl_platform_id[numPlatforms];
         clGetPlatformIDs(platforms.length, platforms, null);
         cl_platform_id platform = platforms[platformIndex];
 
@@ -70,12 +73,12 @@ public class Main {
         contextProperties.addProperty(CL_CONTEXT_PLATFORM, platform);
 
         // Obtain the number of devices for the platform
-        int numDevicesArray[] = new int[1];
+        int[] numDevicesArray = new int[1];
         clGetDeviceIDs(platform, deviceType, 0, null, numDevicesArray);
         int numDevices = numDevicesArray[0];
 
         // Obtain a device ID
-        cl_device_id devices[] = new cl_device_id[numDevices];
+        cl_device_id[] devices = new cl_device_id[numDevices];
         clGetDeviceIDs(platform, deviceType, numDevices, devices, null);
         cl_device_id device = devices[deviceIndex];
 
@@ -86,6 +89,7 @@ public class Main {
 
         // Create a command-queue for the selected device
         cl_queue_properties properties = new cl_queue_properties();
+        properties.addProperty(CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE);
         cl_command_queue commandQueue = clCreateCommandQueueWithProperties(
                 context, device, properties, null);
 
@@ -101,7 +105,7 @@ public class Main {
 
         cl_mem outputMemVec = clCreateBuffer(context,
                 CL_MEM_READ_WRITE,
-                Sizeof.cl_float * m, null, null);
+                (long) Sizeof.cl_float * m, null, null);
 
         // Create the program from the source code
         String programSource = readFile("kernels/matvecprod.cl");
@@ -123,15 +127,23 @@ public class Main {
         long[] global_work_size = new long[]{m};
         long[] local_work_size = new long[]{1};
 
+        cl_event events[] = new cl_event[] { new cl_event() }; // JOCL: Create an event!
+
         // Execute the kernel
+        long before_kernel = System.nanoTime();
         clEnqueueNDRangeKernel(commandQueue, kernel, 1, null,
                 global_work_size, local_work_size,
-                0, null, null);
+                0, null, events[0]);
+
+        clWaitForEvents(1, events); // JOCL: wait for the event!
+        long after_kernel = System.nanoTime();
+        clReleaseEvent(events[0]);
+
 
 
         // Read the output data
         clEnqueueReadBuffer(commandQueue, outputMemVec, CL_TRUE, 0,
-                m * Sizeof.cl_float, Pointer.to(outputArray),
+                (long) m * Sizeof.cl_float, Pointer.to(outputArray),
                 0, null, null);
 
 
@@ -144,10 +156,31 @@ public class Main {
         clReleaseCommandQueue(commandQueue);
         clReleaseContext(context);
 
-        // Verify the result
-        System.out.println(Arrays.toString(outputArray));
+        long after_device = System.nanoTime();
 
+
+        double kernelTime = (double)(after_kernel-before_kernel) / 1e6;
+        double deviceTime = (double)(after_device-before_device) / 1e6;
+        System.out.printf("completed in %f ms (%f ms kernel time)%n", deviceTime, kernelTime);
+
+        // Verify the result
+        System.out.println();
+        System.out.println();
+        verify(result, outputArray, 1e-1f);
     }
+
+    public static boolean verify(float[] vec_a, float[] vec_b, float diff){
+        boolean good = vec_a.length == vec_b.length;
+        for (int i = 0; i < vec_a.length; i++) {
+            if(Math.abs(vec_a[i] - vec_b[i]) > diff) {
+                good = false;
+                System.out.println("diff at i=" + i +" of " + (vec_a[i] - vec_b[i]) );
+            }
+        }
+        System.out.println("Vectors of length " + vec_b.length + " match" + (good ? "":" not") + " to " + diff);
+        return good;
+    }
+
 
     /* Size of double mat needs to be square double size(vec)
      */
