@@ -4,6 +4,7 @@ import static de.hsi.vecmat.FileFinder.readFile;
 import static org.jocl.CL.*;
 
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -18,10 +19,14 @@ public class Main {
         System.out.println("###########################################");
         System.out.println();
 
-        int m = 999999999;
+        int m = 1;
+        int n = 1;
 
-        if(args.length == 1) {
+        if(args.length >= 1) {
             m = Integer.parseInt(args[0]);
+        }
+        if(args.length >= 2) {
+            n = Integer.parseInt(args[1]);
         }
         if(m > (int) Math.sqrt(Integer.MAX_VALUE)){
             m = (int) Math.sqrt(Integer.MAX_VALUE);
@@ -35,7 +40,7 @@ public class Main {
 
 
 
-        System.out.println("Chosen problem size: m=" + m);
+        System.out.println("Chosen problem size: m=" + m + " with in local_work_size=" + n);
         System.out.println();
 
         Random r = new Random();
@@ -95,6 +100,14 @@ public class Main {
         clGetDeviceIDs(platform, deviceType, numDevices, devices, null);
         cl_device_id device = devices[deviceIndex];
 
+        {
+            int[] buffer = {0};
+            clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_GROUP_SIZE, Sizeof.size_t, Pointer.to(buffer), null);
+            int maxWorkGroupSize = buffer[0];
+            System.out.printf("CL_DEVICE_MAX_WORK_GROUP_SIZE:\t\t%d\n", maxWorkGroupSize);
+            if(n > maxWorkGroupSize) n = maxWorkGroupSize;
+        }
+
         // Create a context for the selected device
         cl_context context = clCreateContext(
                 contextProperties, 1, new cl_device_id[]{device},
@@ -141,8 +154,9 @@ public class Main {
         clSetKernelArg(kernel, a++, Sizeof.cl_int, Pointer.to(new int[]{m}));
 
 
+
         long[] global_work_size = new long[]{m};
-        long[] local_work_size = new long[]{1};
+        long[] local_work_size = new long[]{n};
 
         cl_event events[] = new cl_event[] { new cl_event() }; // JOCL: Create an event!
 
