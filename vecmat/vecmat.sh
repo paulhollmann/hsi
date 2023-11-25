@@ -24,4 +24,4 @@ rm /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/target/vecmat-0.0.1-SNAPSHOT.jar
 /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/mvn.sh assembly:single
 
  # call to the parallel program
-java -jar /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/target/vecmat-0.0.1-SNAPSHOT.jar
+java -jar /work/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar
