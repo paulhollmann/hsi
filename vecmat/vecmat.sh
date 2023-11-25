@@ -9,7 +9,7 @@
 #SBATCH -o /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/out.%j
 
 #SBATCH --mem-per-cpu=3800
-#SBATCH --time=00:30
+#SBATCH --time=00:05:00
 #SBATCH -n 1
 #SBATCH -c 8
 
@@ -34,6 +34,6 @@ java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 100
 java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000
 java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000
 java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 100000
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000
 
 

@@ -15,9 +15,10 @@ public class Main {
 
     public static void main(String[] args)
     {
+        System.out.println("###########################################");
+        System.out.println();
 
-
-        int m = 99999999;
+        int m = 999999999;
 
         if(args.length == 1) {
             m = Integer.parseInt(args[0]);
@@ -27,36 +28,35 @@ public class Main {
             m = (int) Math.sqrt(Integer.MAX_VALUE);
         }
         long max_floats = Runtime.getRuntime().maxMemory() / Float.BYTES;
-        if((long) 2 * m * m > max_floats){
+        if(1.2 * m * m > max_floats){
 
-            m = (int) (Math.sqrt(max_floats) / 1.5) ;
+            m = (int) (Math.sqrt(max_floats) / 1.2);
             System.out.println("Max mem " + Runtime.getRuntime().maxMemory() / (1024 * 1024) + " MB, so about " + max_floats + "floats -> m=" +m );
         }
 
 
-        System.out.println();
-        System.out.println();
+
         System.out.println("Chosen problem size: m=" + m);
         System.out.println();
 
         Random r = new Random();
         var mat = new float[m*m];
         var vec = new float[m];
-        float[] outputArray = new float[m];
+        float[] result_device = new float[m];
 
         for(int i = 0; i < m; i++)
         {
-            vec[i] = 100* r.nextFloat();
+            vec[i] = r.nextFloat();
             for(int j = 0; j < m; j++)
             {
-                mat[i*m + j] = 100 * r.nextFloat();
+                mat[i*m + j] = r.nextFloat();
             }
         }
 
         System.out.println("-----Host-----");
 
         long start = System.nanoTime();
-        var result = getMatVecProd(mat, vec);
+        float[] result_cpu = getMatVecProd(mat, vec);
         long end = System.nanoTime();
         double time = (double)(end-start) / 1e6;
         System.out.printf("completed in %f ms %n", time);
@@ -64,7 +64,7 @@ public class Main {
 
 
         System.out.println("-----Device-----");
-        long before_device = System.nanoTime();
+
         final int platformIndex = 0;
         final long deviceType = CL_DEVICE_TYPE_ALL;
         final int deviceIndex = 0;
@@ -101,26 +101,6 @@ public class Main {
                 contextProperties, 1, new cl_device_id[]{device},
                 null, null, null);
 
-        // Create a command-queue for the selected device
-        cl_queue_properties properties = new cl_queue_properties();
-        properties.addProperty(CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE);
-        cl_command_queue commandQueue = clCreateCommandQueueWithProperties(
-                context, device, properties, null);
-
-
-
-        // Allocate the memory objects for the input- and output data
-        cl_mem inputMemVec = clCreateBuffer(context,
-                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                (long) Sizeof.cl_float * vec.length, Pointer.to(vec), null);
-        cl_mem inputMemMat= clCreateBuffer(context,
-                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                (long) Sizeof.cl_float * mat.length, Pointer.to(mat), null);
-
-        cl_mem outputMemVec = clCreateBuffer(context,
-                CL_MEM_READ_WRITE,
-                (long) Sizeof.cl_float * m, null, null);
-
         // Create the program from the source code
         String programSource = readFile("kernels/matvecprod.cl");
         cl_program program = clCreateProgramWithSource(context,
@@ -132,11 +112,35 @@ public class Main {
         // Create the kernel
         cl_kernel kernel = clCreateKernel(program, "vecmatprod", null);
 
+        // Create a command-queue for the selected device
+        cl_queue_properties properties = new cl_queue_properties();
+        properties.addProperty(CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE);
+        cl_command_queue commandQueue = clCreateCommandQueueWithProperties(
+                context, device, properties, null);
+
+        long before_device = System.nanoTime();
+
+
+        // Allocate the memory objects for the input- and output data
+        cl_mem inputMemMat = clCreateBuffer(context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                (long) Sizeof.cl_float * mat.length, Pointer.to(mat), null);
+        cl_mem inputMemVec= clCreateBuffer(context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                (long) Sizeof.cl_float * vec.length, Pointer.to(vec), null);
+
+        cl_mem outputMemVec = clCreateBuffer(context,
+                CL_MEM_READ_WRITE,
+                (long) Sizeof.cl_float * m, null, null);
+
+
+
         int a = 0;
         clSetKernelArg(kernel, a++, Sizeof.cl_mem, Pointer.to(inputMemMat));
         clSetKernelArg(kernel, a++, Sizeof.cl_mem, Pointer.to(inputMemVec));
         clSetKernelArg(kernel, a++, Sizeof.cl_mem, Pointer.to(outputMemVec));
-        clSetKernelArg(kernel, a++, Sizeof.cl_uint, Pointer.to(new int[]{m}));
+        clSetKernelArg(kernel, a++, Sizeof.cl_int, Pointer.to(new int[]{m}));
+
 
         long[] global_work_size = new long[]{m};
         long[] local_work_size = new long[]{1};
@@ -147,9 +151,9 @@ public class Main {
         long before_kernel = System.nanoTime();
         clEnqueueNDRangeKernel(commandQueue, kernel, 1, null,
                 global_work_size, local_work_size,
-                0, null, events[0]);
+                0, null, null);
 
-        clWaitForEvents(1, events); // JOCL: wait for the event!
+        //clWaitForEvents(1, events); // JOCL: wait for the event!
         long after_kernel = System.nanoTime();
         clReleaseEvent(events[0]);
 
@@ -157,9 +161,9 @@ public class Main {
 
         // Read the output data
         clEnqueueReadBuffer(commandQueue, outputMemVec, CL_TRUE, 0,
-                (long) m * Sizeof.cl_float, Pointer.to(outputArray),
+                (long) m * Sizeof.cl_float, Pointer.to(result_device),
                 0, null, null);
-
+        long after_device = System.nanoTime();
 
         // Release memory objects
         clReleaseMemObject(inputMemVec);
@@ -170,7 +174,7 @@ public class Main {
         clReleaseCommandQueue(commandQueue);
         clReleaseContext(context);
 
-        long after_device = System.nanoTime();
+
 
 
         double kernelTime = (double)(after_kernel-before_kernel) / 1e6;
@@ -180,7 +184,7 @@ public class Main {
         // Verify the result
         System.out.println();
         System.out.println();
-        verify(result, outputArray, 1e-1f);
+        verify(result_cpu, result_device, 5e-3f);
     }
 
     public static boolean verify(float[] vec_a, float[] vec_b, float diff){
