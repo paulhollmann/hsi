@@ -11,6 +11,7 @@
 #SBATCH --mem-per-cpu=3800
 #SBATCH --time=00:30
 #SBATCH -n 1
+#SBATCH -c 8
 
 #SBATCH --gres=gpu:v100:4
 
