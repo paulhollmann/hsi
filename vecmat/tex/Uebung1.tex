@@ -78,12 +78,13 @@ subtask=ruled %or plain
 	
 	
 	\begin{task}{Ausführung auf dem Lichtenberg-Hochleistungsrechner} 
-		Zur Ausführung auf dem Cluster wird ein Job Script gebraucht.
-		
+		Zur Ausführung auf dem Cluster wird ein Job Script gebraucht. Zur Unterstützung verwenden wir hier Maven.
+		Wir erstellen das Dokument vecmat.sh voller batch Befehle.
+		Dieses nimmt einige Einstellungen vor, lädt die notwendigen Module, baut das Programm unter Nutzung der Maven Bibliothek und führt es dann in unterschiedlichen Parameterkonfigurationen aus.
 	\end{task}
 
 	\begin{task}{Messungen und Analyse} 
-		In dieser Teilaufgabe ist verlangt für einige Problemgrößen die Ausführungszeit zu messen.
+		In dieser Teilaufgabe ist es nun verlangt für einige Problemgrößen die Ausführungszeit auf dem Cluster zu messen.
 		
 		\begin{tabular}{|c|c|c|}
 			\hline
@@ -102,6 +103,11 @@ subtask=ruled %or plain
 			15000 & 409.209827 ms & 827.959536 ms (241.992205 ms kernel time) \\
 			\hline
 		\end{tabular}
+	
+		Erkennbar ist, dass die Parallelisierung für diese Problemgröße und ohne Erfahrung noch nicht optimiert, keine Beschleunigung der Multiplikation darstellt.
+		Die Erstellung der Threads ist bei $m=10$ noch zu aufwendig, dass es ein Vielfaches der Ausführung des sequentiellen Codes braucht.
+		Bei höheren Problemgrößen gewinnt der Kernel alleine gegen die sequentielle Funktion, allerdings gibt es Overhead bei der Erstellung der Objekte und dem Kopieren der großen Arrays in den device-memory.
+		Für solch ein kleines Problem, scheint sich die Parallelisierung noch nicht zu lohnen.
 	\end{task}
 
 	\begin{task} {Variation der Anzahl der work-groups}
