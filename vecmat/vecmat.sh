@@ -33,5 +33,7 @@ java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10
 java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 100
 java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000
 java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 100000
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000
 
 
