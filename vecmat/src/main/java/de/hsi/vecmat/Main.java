@@ -154,7 +154,7 @@ public class Main {
 
 
 
-        cl_event events[] = new cl_event[] { new cl_event() }; // JOCL: Create an event!
+        //cl_event[] events = new cl_event[] { new cl_event() };
 
         // Execute the kernel
         long before_kernel = System.nanoTime();
@@ -164,7 +164,7 @@ public class Main {
 
         //clWaitForEvents(1, events); // JOCL: wait for the event!
         long after_kernel = System.nanoTime();
-        clReleaseEvent(events[0]);
+        //clReleaseEvent(events[0]);
 
 
 
