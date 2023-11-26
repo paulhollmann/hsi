@@ -42,7 +42,7 @@ max=1024
 
 java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 1
 
-for ((i=8; i<=max; i=i+8))
+for ((i=16; i<=max; i=i+16))
 do
     java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 "$i"
 done
