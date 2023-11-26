@@ -13,8 +13,7 @@
 #SBATCH -n 1
 #SBATCH -c 2
 #SBATCH --exclusive
-
-#SBATCH --gres=gpu:v100
+#SBATCH --gres=gpu:v100:4
 
  # first remove all modules and load required modules
 module purge
