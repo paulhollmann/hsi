@@ -161,7 +161,7 @@ public class Main {
                 global_work_size, n <= 0 ? null: local_work_size,
                 0, null, events[0]);
 
-        clWaitForEvents(1, events); // JOCL: wait for the event!
+
         //long after_kernel = System.nanoTime();
 
         // Read the output data
@@ -169,7 +169,7 @@ public class Main {
                 (long) m * Sizeof.cl_float, Pointer.to(result_device),
                 0, null, null);
         long after_device = System.nanoTime();
-
+        clWaitForEvents(1, events); // JOCL: wait for the event!
 
 
         double kernelTime = compute_event_time(events[0]);
