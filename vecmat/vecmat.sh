@@ -12,6 +12,7 @@
 #SBATCH --time=00:05:00
 #SBATCH -n 1
 #SBATCH -c 8
+#SBATCH --exclusive
 
 #SBATCH --gres=gpu:v100:4
 
@@ -26,6 +27,8 @@ cd /work/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/ || exit
 # build the project
 ./mvn.sh
 ./mvn.sh assembly:single
+
+nvidia-smi 1>&2
 
  # call to the parallel program
 #java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1
