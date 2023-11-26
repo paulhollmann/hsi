@@ -15,7 +15,7 @@ public class Main {
         //System.out.println("###########################################");
         //System.out.println();
 
-        int m = 10;
+        int m = 10000;
         int n = -1;
 
         if(args.length >= 1) {
@@ -70,7 +70,7 @@ public class Main {
         System.out.println("-----Device-----");
         */
         final int platformIndex = 0;
-        final long deviceType = CL_DEVICE_TYPE_ALL;
+        final long deviceType = CL_DEVICE_TYPE_GPU;
         final int deviceIndex = 0;
 
         // Enable exceptions and subsequently omit error checks in this sample
