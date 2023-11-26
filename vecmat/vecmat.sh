@@ -40,7 +40,9 @@ cd /work/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/ || exit
 
 max=1024
 
-for ((i=1; i<=max; i=i+8))
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 1
+
+for ((i=8; i<=max; i=i+8))
 do
     java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 "$i"
 done
