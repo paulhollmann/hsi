@@ -160,7 +160,7 @@ public class Main {
         // Execute the kernel
         long before_kernel = System.nanoTime();
         clEnqueueNDRangeKernel(commandQueue, kernel, 1, null,
-                global_work_size, n < 0 ? null: local_work_size,
+                global_work_size, n <= 0 ? null: local_work_size,
                 0, null, null);
 
         //clWaitForEvents(1, events); // JOCL: wait for the event!
