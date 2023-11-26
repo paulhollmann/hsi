@@ -20,7 +20,7 @@ subtask=ruled %or plain
 
 
 \ConfigureHeadline{
-	headline={HSI Übung - Niklas Beck und Paul Hollmann}
+	headline={HSI Übung 1 - Niklas Beck und Paul Hollmann}
 }
 
 \begin{document}
@@ -61,7 +61,7 @@ subtask=ruled %or plain
 	\begin{task}{Parallele Berechnung des Matrix-Vektor-Produkts}
 		Noch bevor Bearbeitung der nächsten Teilaufgabe haben wir uns die Dokumentationen von OpenCL und JOCL herausgesucht und anhand der Beispiele aus dem moodle-Kurs und von JOCL ein Verständnis zur Einbindung von OpenCL-Code erlangt.
 		Dann haben wir, noch auf den eigenen Rechnern, einen Kernel in einer Extradatei ausgelagert, da es eine schönere Formatierung ermöglicht.
-		Der ganze Code im Kernel ist ein C++ Dialekt, was hier noch wenige Auswirkungen hat, aber nicht vergessen werden sollte.
+		Der ganze Code im Kernel ist ein C/C++ Dialekt, was hier noch wenige Auswirkungen hat, aber nicht vergessen werden sollte.
 		Als Vorlage zum Kernel dient das Programm aus Aufgabe \ref{task:1}. Wichtige Ergänzungen im Funktionskopf sind hierbei zuerst einmal die Spezifikation als kernel, die Änderung von Arrays zu Pointern als auch die Angabe des Adressraums der Parameter.
 		Sinnvoll in diesem ersten Programm ist der global-Adressbereich, da hier die Variablen von host und device verwendet werden können.
 		Die Datentypen sind in diesem Fall noch die gleichen, es gibt aber zum Beispiel nicht einfach einen double Typ. Dieser scheint standardmäßig nicht auf allen Geräten verfügbar zu sein.
@@ -76,9 +76,9 @@ subtask=ruled %or plain
 		Etwas mehr Aufmerksamkeit mussten wir der memory object Erstellung schenken. Buffer wurden für alle Parameter und die Rückgabe erstellt und die Größe der Dateitypen sollte dazu beachtet werden.
 		Der Kernel wird mit den Buffer-Objekten und möglichen Konstanten verbunden, die Systemzeit wird einmal gemessen und dann geht es endlich zur Ausführung des Kernels:
 		$clEnqueueNDRangeKernel(commandQueue, kernel, 1, null,
-		global_work_size, n < 0 ? null: local_work_size,
+		global\_work\_size, local\_work\_size,
 		0, null, null);$
-		Im Ausführungsbefehl können, wichtig für spätere Ziele, die work\_groups angepasst werden. Zuerst verwenden wir hier NULL, da sich OpenCL dann selbst eine geeignete Größe bestimmt.
+		Im Ausführungsbefehl können, wichtig für spätere Ziele, die work\_groups angepasst werden. Zuerst verwenden wir hier local\_work\_size=NULL, da sich OpenCL dann selbst eine geeignete Größe bestimmt.
 		%Asynchrones Ausführen ? oder nicht und funktioniert daher System.nanoTime()
 		Nach der Ausführung wird der Buffer mit dem Ergebnis gelesen und nochmal die Zeit gemessen.
 		Zu guter Letzt, immer wichtig bei der Arbeit direkt mit Speicher, müssen die Objekte freigegeben werden.
@@ -87,36 +87,43 @@ subtask=ruled %or plain
 	
 	
 	\begin{task}{Ausführung auf dem Lichtenberg-Hochleistungsrechner} 
-		Zur Ausführung auf dem Cluster wird ein Job Script gebraucht. Zur Unterstützung verwenden wir hier Maven.
-		Wir erstellen das Dokument vecmat.sh voller batch Befehle.
+		Zur Ausführung auf dem Cluster wird ein Job Script gebraucht.
+		Wir verwenden hier Maven, zum Compilieren und Bauen einer JAR Datei.
+		Die Größe der Matrix wird als Kommandozeilenparameter übergeben.
+		Das batch Dokument vecmat.sh kann per SLURM in die Processqueue übergeben werden.
 		Dieses nimmt einige Einstellungen vor, lädt die notwendigen Module, baut das Programm unter Nutzung der Maven Bibliothek und führt es dann in unterschiedlichen Parameterkonfigurationen aus.
 	\end{task}
 
 	\begin{task}{Messungen und Analyse} 
 		In dieser Teilaufgabe ist es nun verlangt für einige Problemgrößen die Ausführungszeit auf dem Cluster zu messen.
 		
-		\begin{tabular}{|c|c|c|}
-			\hline
-			Problemgröße $m$ & sequenzielle Abarbeitung & OpenCL - Parallelisierung \\
-			\hline
-			10 & 0.008070 ms & 0.788789 ms (0.326362 ms kernel time) \\
-			\hline
-			1000 & 11.542249 ms & 6.969872 ms (2.329117 ms kernel time) \\
-			\hline
-			2000 & 16.357809 ms & 18.217549 ms (6.386675 ms kernel time) \\
-			\hline
-			4000 & 37.825016 ms & 66.511173 ms (22.459137 ms kernel time) \\
-			\hline
-			8000 & 123.283086 ms & 247.282878 ms (78.444500 ms kernel time) \\
-			\hline
-			15000 & 409.209827 ms & 827.959536 ms (241.992205 ms kernel time) \\
-			\hline
-		\end{tabular}
+		
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{|c|c|c|c|}
+				\hline
+				\textbf{Problemgröße} $m$ & \textbf{CPU Zeit} [ms] & \textbf{Kernelzeit} [ms] & \textbf{Komplette Devicezeit} [ms]  \\
+				\hline
+				1 & 0.003343 & 0.037888 & 0.765934 \\
+				10 & 0.007416 & 0.033792 & 0.783118 \\
+				1000 & 18.08856 & 0.164864 & 6.884962 \\
+				2000 & 16.543831 & 0.376832 & 18.906941 \\
+				4000 & 37.728688 & 0.945152 & 67.266515 \\
+				8000 & 123.748559 & 1.862656 & 248.687903 \\
+				15000 & 409.879089 & 2.832384 & 825.980899 \\
+				46340 & 3815.686135 & 35.605504 & 7729.755513 \\
+				\hline
+			\end{tabular}
+			\caption{Vergleich CPU vs. GPU Ausführungen.}
+			\label{tab:data}
+		\end{table}
+		Tabelle \cite{tab:data} stellt für verschiedene Problemgrößen die Rechenzeiten unterteilt in CPU Zeit, Kernelzeit und komplette Devicezeit\footnote{Device Speicherallokation + Kopieren der Arrays hin und zurück sowie Aufruf und Ausführen des Kernels.} dar.
 	
-		Erkennbar ist, dass die Parallelisierung für diese Problemgröße und ohne Erfahrung noch nicht optimiert, keine Beschleunigung der Multiplikation darstellt.
-		Die Erstellung der Threads ist bei $m=10$ noch zu aufwendig, dass es ein Vielfaches der Ausführung des sequentiellen Codes braucht.
+		Erkennbar ist, dass die Parallelisierung bis Problemgröße $m=10$, keine Beschleunigung der Multiplikation darstellt.
+		Die Erstellung der Threads ist bei $m=10$ noch zu aufwendig, dass es ein Vielfaches der Zeit des sequentiellen Codes braucht.
 		Bei höheren Problemgrößen gewinnt der Kernel alleine gegen die sequentielle Funktion, allerdings gibt es Overhead bei der Erstellung der Objekte und dem Kopieren der großen Arrays in den device-memory.
-		Für solch ein kleines Problem, scheint sich die Parallelisierung noch nicht zu lohnen.
+		Für das Problem alleine, scheint sich die Parallelisierung noch nicht zu lohnen.
+		Kann aber mit den Daten auf dem Device weitergearbeitet fallen die Kopiervorgänge weitestgehend weg, und dann bietet die einen echten zeitlichen Vorteil.
 	\end{task}
 
 	\begin{task} {Variation der Anzahl der work-groups}
@@ -129,10 +136,13 @@ subtask=ruled %or plain
 		
 		Dokumentieren Sie die zur Ausführung verwendete Hardware und relevante OpenCL Informationen (CL\_DEVICE\_MAX\_WORK\_GROUP\_SIZE etc.).
 		
+		\footnote{fkspmfkndsknfkdsf}
 		Was ist zu beobachten und wie erklärt sich das Ergebnis?
 		
 		
 	\end{task}
 
+
+	
 	
 \end{document}
