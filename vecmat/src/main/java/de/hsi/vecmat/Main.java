@@ -71,7 +71,7 @@ public class Main {
         final int deviceIndex = 0;
 
         // Enable exceptions and subsequently omit error checks in this sample
-        CL.setExceptionsEnabled(true); //TODO DISABLE ERROR LOGGING
+        CL.setExceptionsEnabled(false); //TODO DISABLE ERROR LOGGING
 
         // Obtain the number of platforms
         int[] numPlatformsArray = new int[1];

@@ -8,10 +8,10 @@
 #SBATCH -e /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/err.%j
 #SBATCH -o /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/out.%j
 
-#SBATCH --mem-per-cpu=7600
+#SBATCH --mem-per-cpu=15200
 #SBATCH --time=00:15:00
 #SBATCH -n 1
-#SBATCH -c 2
+#SBATCH -c 4
 #SBATCH --gres=gpu:v100:4
 
  # first remove all modules and load required modules
