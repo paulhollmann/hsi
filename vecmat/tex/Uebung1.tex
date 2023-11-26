@@ -12,6 +12,8 @@ subtask=ruled %or plain
 
 \usepackage{float}
 
+\usepackage{tikz,pgfplots}
+
 \usepackage{biblatex}
 %\bibliography{DEMO-TUDaBibliography}
 
@@ -114,16 +116,70 @@ subtask=ruled %or plain
 				46340 & 3815.686135 & 35.605504 & 7729.755513 \\
 				\hline
 			\end{tabular}
+			
+	
 			\caption{Vergleich CPU vs. GPU Ausführungen.}
 			\label{tab:data}
 		\end{table}
-		Tabelle \cite{tab:data} stellt für verschiedene Problemgrößen die Rechenzeiten unterteilt in CPU Zeit, Kernelzeit und komplette Devicezeit\footnote{Device Speicherallokation + Kopieren der Arrays hin und zurück sowie Aufruf und Ausführen des Kernels.} dar.
+		\begin{figure}[H]
+			\begin{tikzpicture}
+				\begin{axis}[
+					width=\linewidth,
+					height=5cm,
+					xlabel={Problemgröße},
+					ylabel={Zeit [ms]},
+					legend style={at={(0.5,-0.2)}, anchor=north},
+					ymajorgrids=true,
+					xmode=log,
+					log basis x={10},
+					]
+					
+					\addplot[
+					color=blue,
+					mark=*,
+					]
+					coordinates {
+						(1, 0.003343)
+						(10, 0.007416)
+						(1000, 18.08856)
+						(2000, 16.543831)
+						(4000, 37.728688)
+						(8000, 123.748559)
+						(15000, 409.879089)
+					};
+					\addlegendentry{CPU Zeit}
+					
+					\addplot[
+					color=red,
+					mark=square,
+					]
+					coordinates {
+						(1, 0.037888)
+						(10, 0.033792)
+						(1000, 0.164864)
+						(2000, 0.376832)
+						(4000, 0.945152)
+						(8000, 1.862656)
+						(15000, 2.832384)
+					};
+					\addlegendentry{Kernelzeit}
+					
+				\end{axis}
+			\end{tikzpicture}
+			\caption{Daten aus \autoref{tab:data} als Plot.}
+		\end{figure}
+		
+		\autoref{tab:data} stellt für verschiedene Problemgrößen die Rechenzeiten unterteilt in CPU Zeit, Kernelzeit und komplette Devicezeit\footnote{Device Speicherallokation + Kopieren der Arrays hin und zurück sowie Aufruf und Ausführen des Kernels.} dar.
 	
 		Erkennbar ist, dass die Parallelisierung bis Problemgröße $m=10$, keine Beschleunigung der Multiplikation darstellt.
 		Die Erstellung der Threads ist bei $m=10$ noch zu aufwendig, dass es ein Vielfaches der Zeit des sequentiellen Codes braucht.
 		Bei höheren Problemgrößen gewinnt der Kernel alleine gegen die sequentielle Funktion, allerdings gibt es Overhead bei der Erstellung der Objekte und dem Kopieren der großen Arrays in den device-memory.
 		Für das Problem alleine, scheint sich die Parallelisierung noch nicht zu lohnen.
 		Kann aber mit den Daten auf dem Device weitergearbeitet fallen die Kopiervorgänge weitestgehend weg, und dann bietet die einen echten zeitlichen Vorteil.
+		
+		
+		
+		
 	\end{task}
 
 	\begin{task} {Variation der Anzahl der work-groups}
