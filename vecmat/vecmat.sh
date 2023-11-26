@@ -11,10 +11,10 @@
 #SBATCH --mem-per-cpu=3800
 #SBATCH --time=00:05:00
 #SBATCH -n 1
-#SBATCH -c 8
+#SBATCH -c 2
 #SBATCH --exclusive
 
-#SBATCH --gres=gpu:v100:4
+#SBATCH --gres=gpu:v100:1
 
  # first remove all modules and load required modules
 module purge
