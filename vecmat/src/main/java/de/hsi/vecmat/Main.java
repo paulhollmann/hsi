@@ -42,7 +42,7 @@ public class Main {
 
         //System.out.println();
 
-        Random r = new Random();
+        Random r = new Random(69L);
         var mat = new float[m*m];
         var vec = new float[m];
         float[] result_device = new float[m];
