@@ -8,8 +8,8 @@
 #SBATCH -e /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/err.%j
 #SBATCH -o /home/kurse/kurs00069/ph84wuqa/hsi/vecmat/logs/out.%j
 
-#SBATCH --mem-per-cpu=3800
-#SBATCH --time=00:05:00
+#SBATCH --mem-per-cpu=7600
+#SBATCH --time=00:15:00
 #SBATCH -n 1
 #SBATCH -c 2
 #SBATCH --exclusive
@@ -31,14 +31,14 @@ cd /work/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/ || exit
 nvidia-smi 1>&2
 
  # call to the parallel program
-#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1
-#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10
-#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000
-#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 2000
-#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 4000
-#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 8000
-#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 15000
-#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 100000
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 2000
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 4000
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 8000
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 15000
+java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 100000
 
 
 max=1024

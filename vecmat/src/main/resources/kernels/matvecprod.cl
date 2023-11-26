@@ -4,9 +4,10 @@ __kernel void vecmatprod(__global const float *mat,
              const int m)
 {
     int gid = get_global_id(0);
+    if(gid >= m) return;
     float sum = 0.0f;
     for(int i = 0; i < m; ++i) {
         sum += mat[gid * m + i] * vec[i];
     }
-    if(gid < m) res[gid] = sum;
+    res[gid] = sum;
 }

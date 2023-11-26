@@ -7,7 +7,6 @@ import java.util.Random;
 
 import org.jocl.*;
 
-
 public class Main {
 
     public static void main(String[] args)
@@ -56,25 +55,23 @@ public class Main {
             }
         }
 
-        /*
-        System.out.println("-----Host-----");
 
-        long start = System.nanoTime();
+        //System.out.println("-----Host-----");
+        long cpu_start = System.nanoTime();
         float[] result_cpu = getMatVecProd(mat, vec);
-        long end = System.nanoTime();
-        double time = (double)(end-start) / 1e6;
-        System.out.printf("completed in %f ms %n", time);
+        long cpu_end = System.nanoTime();
+        double h_time = (double)(cpu_end-cpu_start) / 1e6;
+        //System.out.printf("completed in %f ms %n", h_time);
 
 
+        //System.out.println("-----Device-----");
 
-        System.out.println("-----Device-----");
-        */
         final int platformIndex = 0;
         final long deviceType = CL_DEVICE_TYPE_GPU;
         final int deviceIndex = 0;
 
         // Enable exceptions and subsequently omit error checks in this sample
-        CL.setExceptionsEnabled(false); //TODO DISABLE ERROR LOGGING
+        CL.setExceptionsEnabled(true); //TODO DISABLE ERROR LOGGING
 
         // Obtain the number of platforms
         int[] numPlatformsArray = new int[1];
@@ -130,6 +127,7 @@ public class Main {
         cl_command_queue commandQueue = clCreateCommandQueueWithProperties(
                 context, device, properties, null);
 
+
         long before_device = System.nanoTime();
 
 
@@ -154,20 +152,17 @@ public class Main {
         clSetKernelArg(kernel, a++, Sizeof.cl_int, Pointer.to(new int[]{m}));
 
 
+        cl_event[] events = new cl_event[] { new cl_event() };
 
-        //cl_event[] events = new cl_event[] { new cl_event() };
 
         // Execute the kernel
-        long before_kernel = System.nanoTime();
+        //long before_kernel = System.nanoTime();
         clEnqueueNDRangeKernel(commandQueue, kernel, 1, null,
                 global_work_size, n <= 0 ? null: local_work_size,
-                0, null, null);
+                0, null, events[0]);
 
-        //clWaitForEvents(1, events); // JOCL: wait for the event!
-        long after_kernel = System.nanoTime();
-        //clReleaseEvent(events[0]);
-
-
+        clWaitForEvents(1, events); // JOCL: wait for the event!
+        //long after_kernel = System.nanoTime();
 
         // Read the output data
         clEnqueueReadBuffer(commandQueue, outputMemVec, CL_TRUE, 0,
@@ -175,7 +170,16 @@ public class Main {
                 0, null, null);
         long after_device = System.nanoTime();
 
+
+
+        double kernelTime = compute_event_time(events[0]);
+        double deviceTime = (double)(after_device-before_device) / 1e6;
+
+        System.out.println("m="+m + ", gws=" + global_work_size[0] + ", lws="+ (n >0 ? n : "auto") + ", dt="+ deviceTime +", kt=" + kernelTime + ", ht=" + h_time);
+
+
         // Release memory objects
+        clReleaseEvent(events[0]);
         clReleaseMemObject(inputMemVec);
         clReleaseMemObject(inputMemMat);
         clReleaseMemObject(outputMemVec);
@@ -186,15 +190,10 @@ public class Main {
 
 
 
-
-        double kernelTime = (double)(after_kernel-before_kernel) / 1e6;
-        double deviceTime = (double)(after_device-before_device) / 1e6;
-        //System.out.printf("completed in %f ms (%f ms kernel time)%n", deviceTime, kernelTime);
-        System.out.println(m + ", " + global_work_size[0] + ", "+ (n >0 ? n : "auto") + ", "+ deviceTime +", " + kernelTime + " ");
         // Verify the result
         //System.out.println();
         //System.out.println();
-        //verify(result_cpu, result_device, 5e-3f);
+        verify(result_cpu, result_device, 5e-3f);
     }
 
     public static boolean verify(float[] vec_a, float[] vec_b, float diff){
@@ -208,8 +207,20 @@ public class Main {
                 if(count > 5) break;
             }
         }
-        System.out.println("Vectors of length " + vec_b.length + " match" + (good ? "":" not") + " to " + diff);
+        //System.out.println("Vectors of length " + vec_b.length + " match" + (good ? "":" not") + " to " + diff);
         return good;
+    }
+
+    public static double compute_event_time(cl_event event) {
+        long before[] = new long[1];
+        long after[] = new long[1];
+        clGetEventProfilingInfo(
+                event, CL_PROFILING_COMMAND_START,
+                Sizeof.cl_ulong, Pointer.to(before), null);
+        clGetEventProfilingInfo(
+                event, CL_PROFILING_COMMAND_END,
+                Sizeof.cl_ulong, Pointer.to(after), null);
+        return (double)(after[0]-before[0]) / 1e6;
     }
 
 
