@@ -12,7 +12,6 @@
 #SBATCH --time=00:15:00
 #SBATCH -n 1
 #SBATCH -c 2
-#SBATCH --exclusive
 #SBATCH --gres=gpu:v100:4
 
  # first remove all modules and load required modules
