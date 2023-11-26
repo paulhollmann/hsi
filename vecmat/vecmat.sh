@@ -28,22 +28,24 @@ cd /work/home/kurse/kurs00069/ph84wuqa/hsi/vecmat/ || exit
 ./mvn.sh assembly:single
 
  # call to the parallel program
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 2000
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 4000
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 8000
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 15000
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 100000
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 2000
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 4000
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 8000
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 15000
+#java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 100000
 
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 1
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 16
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 32
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 64
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 128
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 512
-java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 1024
+
+max=1024
+
+for i in $(seq 1 $max)
+do
+    java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 10000 "$i"
+done
+
+
 
 #java -jar target/vecmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1000000
 

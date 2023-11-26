@@ -12,8 +12,8 @@ public class Main {
 
     public static void main(String[] args)
     {
-        System.out.println("###########################################");
-        System.out.println();
+        //System.out.println("###########################################");
+        //System.out.println();
 
         int m = 10;
         int n = -1;
@@ -38,9 +38,9 @@ public class Main {
         if(n>0){
             global_work_size = new long[]{m%n == 0 ? m : (m/n + 1) * n};
         }
-        System.out.println("Chosen problem size: m=" + m + " with in local_work_size=" + (n >0 ? n : "auto") + " and global_work_size=" + global_work_size[0]);
+        //System.out.println("Chosen problem size: m=" + m + " with in local_work_size=" + (n >0 ? n : "auto") + " and global_work_size=" + global_work_size[0]);
 
-        System.out.println();
+        //System.out.println();
 
         Random r = new Random();
         var mat = new float[m*m];
@@ -56,6 +56,7 @@ public class Main {
             }
         }
 
+        /*
         System.out.println("-----Host-----");
 
         long start = System.nanoTime();
@@ -67,7 +68,7 @@ public class Main {
 
 
         System.out.println("-----Device-----");
-
+        */
         final int platformIndex = 0;
         final long deviceType = CL_DEVICE_TYPE_ALL;
         final int deviceIndex = 0;
@@ -103,7 +104,7 @@ public class Main {
             int[] buffer = {0};
             clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_GROUP_SIZE, Sizeof.size_t, Pointer.to(buffer), null);
             int maxWorkGroupSize = buffer[0];
-            System.out.printf("CL_DEVICE_MAX_WORK_GROUP_SIZE:\t\t%d\n", maxWorkGroupSize);
+            //System.out.printf("CL_DEVICE_MAX_WORK_GROUP_SIZE:\t\t%d\n", maxWorkGroupSize);
             if(n > maxWorkGroupSize) n = maxWorkGroupSize;
         }
 
@@ -188,12 +189,12 @@ public class Main {
 
         double kernelTime = (double)(after_kernel-before_kernel) / 1e6;
         double deviceTime = (double)(after_device-before_device) / 1e6;
-        System.out.printf("completed in %f ms (%f ms kernel time)%n", deviceTime, kernelTime);
-
+        //System.out.printf("completed in %f ms (%f ms kernel time)%n", deviceTime, kernelTime);
+        System.out.println(m + ", " + global_work_size[0] + ", "+ (n >0 ? n : "auto") + ", "+ deviceTime +", " + kernelTime + " ");
         // Verify the result
-        System.out.println();
-        System.out.println();
-        verify(result_cpu, result_device, 5e-3f);
+        //System.out.println();
+        //System.out.println();
+        //verify(result_cpu, result_device, 5e-3f);
     }
 
     public static boolean verify(float[] vec_a, float[] vec_b, float diff){

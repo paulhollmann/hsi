@@ -25,13 +25,13 @@ public class FileFinder {
         String filePath = null;
 
         for (String str : paths) {
-            System.out.print("Searching for " + System.getProperty("user.dir") + "/" + str + fileName );
+            //System.out.print("Searching for " + System.getProperty("user.dir") + "/" + str + fileName );
             if((new File( str + fileName)).isFile()){
                 filePath =  str + fileName;
-                System.out.println(" found");
+                //System.out.println(" found");
                 break;
             }
-            System.out.println(" not found");
+            //System.out.println(" not found");
         }
 
         BufferedReader br = null;
