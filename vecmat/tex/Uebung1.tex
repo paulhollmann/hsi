@@ -42,10 +42,19 @@ subtask=ruled %or plain
 	\begin{task}{Sequentielle Berechnung des Matrix-Vektor-Produkts}\label{task:1}
 		Das Matrix-Vektor-Produkt ist eine wohl bekannte mathematische Operation, welche auch für große Matrizen gebraucht wird.
 		Um die Rechenzeit möglichst gering zu halten, sind parallele Berechnungen sinnvoll zu wählen. Insbesondere wenn gleiche Operationen auf unterschiedlichen Daten ausgeführt werden sollen, ist dies ein gutes Einstiegsbeispiel zur Nutzung von OpenCL.
+		% ^^ ich würde den absatz weglasssen, klingt irgendwie etwas cheesy
 		
-		Als sinnvoller erster Schritt brauchen wir ein sequentielles Programm.
-		Eine kleine Eigenheit der hier verlangten Funktion ist die Eingabe nur eines Wertes $m$, welcher zur Initialisierung einer quadratischen Matrix und eines Vektors mit Zufallswerten genutzt wird. Wesentliches Ziel der Aufgabe ist es die Berechnungszeit zu untersuchen, weshalb konkrete Beispielmatrizen oder nicht-quadratische Beispiele wenig Mehrwert bieten.
-		Ohne Vorgabe eines Datentyps haben wir uns für den Typ float entschieden, da er einen größeren Eingabemenge ermöglicht, aber nicht allzu viel Speicher braucht. Wäre die Präzision relevant, hätten wir uns eher für den double entschieden.
+		Wir entwickeln zunächst ein sequentielles Programm.
+		Nach Eingabe eines Wertes $m$, wird eine quadratische Matrix und ein Vektors mit Zufallswerten gefüllt.  Ziel der Aufgabe ist es die Berechnungszeit des Matrix-Vektor-Produkts zu untersuchen.
+		Ohne Vorgabe eines Datentyps haben wir uns für den Typ float entschieden.
+
+		
+		Für das Speichern der Eingabe- sowie Ausgabevektoren bzw. der Eingabe Matrix nutzen wir native Java Arrays.
+		Wichtig für das Speichern der Matrix nutzen wir ein Array mit Stride von $m$ zwischen einzelnen Zeilen.
+		Das $(i,j)$-te Element findet sich demnach an Postion $i\cdot m + j$.
+		
+		Die eigentliche Berechnung lässt sich mit dann mit zwei for-Schleifen realisieren (siehe Code).
+		
 	\end{task}
 	
 	
