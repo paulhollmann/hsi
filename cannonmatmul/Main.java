@@ -3,25 +3,31 @@ public class Main {
 
     public static void main(String[] args)
     {
-        var n = 3;
+        var n = 4;
+        // Verprobung?: lokale Blockgröße 2
+
         var A = new float[n*n];
         var B = new float[n*n];
         var C = new float[n*n];
 
-        var D = getCannonIteration(A, B, C);
-        for(int i = 0; i < D.length; i++)
+        // Generator für Matrixbelegung
+        for(int i = 0; i < A.length; i++)
         {
-            System.out.println();
+            A[i] = i+1;
+            B[i] = i+1;
+            C[i] = i+1;
         }
+
+        var D = getCannonIteration(A, B, C);
+        for (float d : D) System.out.println(d);
 
     }
 
     public static float[] getCannonIteration(float [] matA, float[] matB, float[] matC){
         assert matA.length == matB.length && matA.length == matC.length;
-        var n = matA.length;
+        int n = (int) Math.sqrt(matA.length);
 
-
-        //Initiale steigernde zyklische Vertauschung
+        // Initialisierung mittels steigernder zyklischer Vertauschung
         for (int i = 0; i < n; i++) { //rows (for A)
             for (int j = 0; j < i; j++) { // amount of commutations
                 var firstAColumnElem = matA[i * n];
@@ -35,8 +41,10 @@ public class Main {
             }
         }
 
-        
-        return matC;
+        // Cannon Iteration
+
+
+        return matB;
     }
 
 }
