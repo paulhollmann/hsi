@@ -1,4 +1,4 @@
-package de.hsi;
+package de.hsi.matmat;
 
 import mpi.*;
 import java.util.Random;
