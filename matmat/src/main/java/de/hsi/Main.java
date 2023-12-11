@@ -1,8 +1,9 @@
+package de.hsi;
 
 import mpi.*;
 import java.util.Random;
 
-public class AllReduceMPJExample {
+public class Main {
 
     public static void main(String[] args) {
         allreduce(args);
