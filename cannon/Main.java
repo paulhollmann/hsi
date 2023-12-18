@@ -6,7 +6,7 @@ public class Main {
     {
         var n = 6;
         // Verprobung?: lokale Blockgröße 2
-        var p = 3;
+        var p = 6;
 
         assert(n % p == 0);
         //Noch bessere Implementation der Verblockung
