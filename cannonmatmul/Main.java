@@ -1,89 +1,124 @@
+import java.util.Random;
 
 public class Main {
 
     public static void main(String[] args)
     {
-        var n = 3;
+        var n = 6;
         // Verprobung?: lokale Blockgröße 2
-        //Noch bessere implementation der Verblockung
+        var p = 3;
 
-        var A = new float[n*n];
-        var B = new float[n*n];
-        var C = new float[n*n];
+        assert(n % p == 0);
+        //Noch bessere Implementation der Verblockung
+
+        var d = n/p;
+
+        var A = new int[p*p][d*d];
+        var B = new int[p*p][d*d];
+        var C = new int[p*p][d*d];
+
+        Random r = new Random(187);
 
         // Generator für Matrixbelegung
-        for(int i = 0; i < n*n; i++)
+        for(int i = 0; i < p*p; i++)
         {
-            A[i] = i+1;
-            B[i] = i+1;
-            C[i] = 0;
+            for(int j = 0; j < d*d; j++)
+            {
+                A[i][j] = i+1;// r.nextInt(100);
+                B[i][j] = i+1;//r.nextInt(100);
+                //C[i][j] = 0;
+            }
         }
         System.out.println("A :");
-        printMatrix(A, n);
+        printMatrix(A, n, p);
         System.out.println("B :");
-        printMatrix(B, n);
+        printMatrix(B, n, p);
         System.out.println("C :");
-        printMatrix(C, n);
+        printMatrix(C, n, p);
 
         var D = getCannonIteration(A, B, C);
-        System.out.println("C = AB * C :");
-        printMatrix(D, n);
+        System.out.println("C = AB * C:");
+        printMatrix(D, n, p);
     }
 
-    public static float[] getCannonIteration(float [] matA, float[] matB, float[] matC){
+    public static int[][] getCannonIteration(int [][] matA, int[][] matB, int[][] matC){
         assert matA.length == matB.length && matA.length == matC.length;
-        int n = (int) Math.sqrt(matA.length);
+        int p = (int) Math.sqrt(matA.length);
+        int d = (int) Math.sqrt(matA[0].length);
+        var n = p*d;
 
         // Initialisierung mittels steigernder zyklischer Vertauschung
-        for (int i = 0; i < n; i++) { //rows (for A)
+        for (int i = 0; i < p; i++) { //block_rows (for A)
             for (int j = 0; j < i; j++) { // amount of commutations
-                var firstAColumnElem = matA[i * n];
+                var firstAColumnElem = matA[i * p];
                 var firstBRowElem = matB[i];
-                for(int k = 0; k < n - 1; k++) { //column elements (for A)
-                    matA[i * n + k] = matA[i * n + k + 1];
-                    matB[k * n + i] = matB[(k+1) * n + i];
+                for(int k = 0; k < p - 1; k++) { //block_column elements (for A)
+                    matA[i * p + k] = matA[i * p + k + 1];
+                    matB[k * p + i] = matB[(k+1) * p + i];
                 }
-                matA[i * n + n-1] = firstAColumnElem;
-                matB[(n-1) * n + i] = firstBRowElem;
+                matA[i * p + p-1] = firstAColumnElem;
+                matB[(p-1) * p + i] = firstBRowElem;
             }
         }
 
+        System.out.println("A :");
+        printMatrix(matA, n, p);
+        System.out.println("B :");
+        printMatrix(matB, n, p);
+
         // Cannon Iteration
-        for(int i = 0; i < n; i++)
+        for(int i = 0; i < p; i++)
         {
             // Multiply Submatrix Axy*Bxy
-            for(int x = 0; x < n; x++)
+            for(int y = 0; y < p; y++)
             {
-                for(int y = 0; y < n; y++)
+                for(int x = 0; x < p; x++)
                 {
-                    matC[y * n + x] += matA[y * n + x] * matB[y * n + x];
+                    // matmul aka matC[y * p + x][0] += matA[y * p + x][0] * matB[y * p + x][0];
+                    for(int yy = 0; yy < d; yy++)
+                    {
+                        for(int xx = 0; xx < d; xx++)
+                        {
+                            var res = 0;
+                            for(int xy = 0; xy < d; xy++)
+                            {
+                                res += matA[y * p + x][yy * d + xy] * matB[y * p + x][xy * d + xx];
+                            }
+                            matC[y * p + x][yy * d + xx] += res;
+                        }
+                    }
                 }
             }
 
             // einfache zyklische Vertauschung
-            for(int j = 0; j < n; j++)
+            for(int j = 0; j < p; j++)
             {
-                var firstAColumnElem = matA[j * n];
+                var firstAColumnElem = matA[j * p];
                 var firstBRowElem = matB[j];
-                for(int k = 0; k < n - 1; k++)
+                for(int k = 0; k < p - 1; k++)
                 {
-                    matA[j * n + k] = matA[j * n + k + 1];
-                    matB[k * n + j] = matB[(k+1) * n + j];
+                    matA[j * p + k] = matA[j * p + k + 1];
+                    matB[k * p + j] = matB[(k+1) * p + j];
                 }
-                matA[j * n + n-1] = firstAColumnElem;
-                matB[(n-1) * n + j] = firstBRowElem;
+                matA[j * p + p-1] = firstAColumnElem;
+                matB[(p-1) * p + j] = firstBRowElem;
             }
         }
 
         return matC;
     }
 
-    public static void printMatrix(float[] mat, int n){
+    public static void printMatrix(int[][] mat, int n, int p){
+        var d = n/p;
         for(int y = 0; y < n; y++)
         {
             for(int x = 0; x < n; x++)
             {
-                System.out.format("%02d  ", (int) mat[y * n + x]);
+                var x_block = x / d;
+                var y_block = y / d;
+                var x_local = x - x_block * d;
+                var y_local = y - y_block * d;
+                System.out.format("%02d  ", mat[y_block * p + x_block][y_local * d + x_local]);
             }
             System.out.println();
         }
