@@ -11,11 +11,14 @@ ml java
 
 ./mvn.sh assembly:single
 
- tar -xf ./lib/mpj-v0_44.tar.gz --directory ./lib
+tar -xf ./lib/mpj-v0_44.tar.gz --directory ./lib
 
- mkdir out
+export MPJ_HOME=./lib/mpj-v0_44
+export PATH=$MPJ_HOME/bin:$PATH
 
- mv target/matmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar out/matmat.jar
+mkdir out
 
- rm -R ./target
+mv target/matmat-0.0.1-SNAPSHOT-jar-with-dependencies.jar out/matmat.jar
+
+rm -R ./target
 
