@@ -8,11 +8,10 @@
 #SBATCH -e /home/kurse/kurs00069/????????/hsi/matmat/logs/err.%j
 #SBATCH -o /home/kurse/kurs00069/???????/hsi/matmat/logs/out.%j
 
-#SBATCH --mem-per-cpu=15200
+#SBATCH --mem-per-cpu=3600
 #SBATCH --time=00:15:00
-#SBATCH -n 4
-#SBATCH -c 1
-#SBATCH --gres=gpu:v100:4
+#SBATCH -n 1
+#SBATCH -c 32
 
 cd /work/home/kurse/kurs00069/?????????/hsi/matmat/ || exit
 
