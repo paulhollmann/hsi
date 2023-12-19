@@ -18,11 +18,11 @@ cd /work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/ || exit
 
 ./build.sh
 
-module load intel/2020.1
+module load intel
 module load java
-module load intel/mpi
 
-export MPJ_HOME=./lib/mpj-v0_44
+
+export MPJ_HOME=/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/lib/mpj-v0_44
 export PATH=$MPJ_HOME/bin:$PATH
 
 srun mpjrun.sh -np 4  out/matmat.jar
