@@ -39,27 +39,36 @@ subtask=ruled %or plain
 	{\Large \textbf{Cannon-Iteration}}
 	\hrule
 	
-	In dieser Übung soll Matrix-Matrix-Produkt per Cannon-Algorithmus untersucht werden.
+	In dieser Übung soll das Matrix-Matrix-Produkt von quadratischen Matrizen per Cannon-Algorithmus untersucht werden.
 	Für große Matrizen sind parallele Algorithmen häufig sinnvoll um die Rechenzeit zu kürzen.
 	
 	\begin{task}{Sequentieller Algorithmus der Cannon-Iteration}\label{task:1}
-	
-		!!!!!
-		Wir entwickeln zunächst ein sequentielles Programm.
-		Nach Eingabe eines Wertes $m$, wird eine quadratische Matrix und ein Vektors mit Zufallswerten gefüllt.  Ziel der Aufgabe ist es die Berechnungszeit des Matrix-Vektor-Produkts zu untersuchen.
-		Ohne Vorgabe eines Datentyps haben wir uns für den Typ float entschieden.
-
+		Ein paralleles Programm starten wir erstmal wieder mit der Entwicklung eines sequentiellen.
+		Als kleinen Zwischenschritt haben wir erst ohne Teilblöcke in der Matrix gearbeitet und später die Struktur der Matrix erweitert.
 		
-		Für das Speichern der Eingabe- sowie Ausgabevektoren bzw. der Eingabe Matrix nutzen wir native Java Arrays.
-		Wichtig für das Speichern der Matrix nutzen wir ein Array mit Stride von $m$ zwischen einzelnen Zeilen.
-		Das $(i,j)$-te Element findet sich demnach an Postion $i\cdot m + j$.
+		Zuerst werden zwei Matrizen A und B gefüllt, testweise mit der Zahlenreihe von 1 bis $n \times n$.
+		In dieser Übung werden wir doppelte Schleifen zur Füllung, Lesen oder Berechnen mit einer Matrix häufig sehen.
+		Also hier bereits eine doppelte Initialisierungsschleife. Gleich danach auch eine einfache Testfunktion um Matrizen auf die Konsole ausgeben zu können.
 		
-		Die eigentliche Berechnung lässt sich mit dann mit zwei for-Schleifen realisieren (siehe Code).
+		Ausgelagert in eine Funktion programmieren wir einen Schritt der Cannon-Iteration.
+		Die Vertauschung in steigender Anzahl an Tauschvorgängen braucht eine Schleife mehr. Zum Tausch muss eine Zwischenspeicherung verwendet werden.
 		
+		Anschließend wird der eigentliche Cannon-Iterationsschritt gemacht. So häufig wie die Matrizen Zeilen (oder Spalten) besitzen werden die folgenden beiden Schritte gemacht:
+		\begin{itemize}
+			\item Berechne die Multiplikation der Elemente $A_{ij}$ und $B_{ij}$ für die Ergebnismatrix an gleicher Position.
+			\item Vertausche in Matrix A alle Elemente spaltenweise nach links und in Matrix B alle Elemente zeilenweise nach oben.
+		\end{itemize}
+		Durch diese Vertauschungen werden alle notwendigen Elemente der Matrizen miteinander multipliziert und es ergibt sich das gewünschte Produkt.
+		
+		Zur Erweiterung der Berechnung für Blockmatrizen muss die Speicherung zuerst angepasst werden. Ein Zweidimensionales Array dient uns hier als Mittel. Darauf müssen die Funktionsdefinitionen und der Befehlszeilen-Output angepasst werden.
+		Auch werden kleine Berechnungen mit Gesamtgröße der Matrix $n$ und Wurzel der Prozessoranzahl $p$ gebraucht.
+		In der Funktion zur Cannon-Iteration müssen viele Schleifenköpfe auf die Anzahl der Durchläufe angepasst werden.
+		Der größte Unterschied liegt in einer ausformulierte Matrixmultiplikation statt einer einfachen Multiplikation.
 	\end{task}
 	
 	
 	\begin{task}{Paralleler Algorithmus mit MPJ}
+		
 		!!!!!
 		Noch bevor Bearbeitung der nächsten Teilaufgabe haben wir uns die Dokumentationen von OpenCL und JOCL herausgesucht und anhand der Beispiele aus dem moodle-Kurs und von JOCL ein Verständnis zur Einbindung von OpenCL-Code erlangt.
 		Dann haben wir, noch auf den eigenen Rechnern, einen Kernel in einer Extradatei ausgelagert, da es eine schönere Formatierung ermöglicht.
@@ -197,110 +206,6 @@ subtask=ruled %or plain
 		Nun wollen wir den Speed-up in Abhängigkeit der Prozessoren $p \in (1, 64)$ berechnen.
 		
 		versch Verteilung der Prozesse auf die verfügbaren Knoten, Proz und Kerne
-		
-		!!!!!
-		Als letztes Ziel wollen wir üben eine gute Anzahl an local-work-groups vorzugeben.
-		Für die CL\_DEVICE\_MAX\_WORK\_GROUP\_SIZE erhalten wir auf der NVIDIA V100 $1024$.  
-		Wir behalten eine konstante Problemgröße von $m = 10000$.
-		Da mit eigener gewählter local\_work\_size (nennen wir sie $l$) die global\_work\_size (nennen wir sie $g$) durch die local\_work\_size teilbar sein sollte,
-		muss
-		$g = m\mod l == 0 ~~? ~~m : (\lfloor m/l \rfloor + 1) \cdot l$
-		gelten. 
-		Überschüssige Elemente im Kernel deren globale id $\ge m$ ist werden in diesem ignoriert.
-	
-		Wir variieren nun local\_work\_size so ergibt sich \autoref{fig:data2}.
-		
-		\begin{figure}[H]
-			\begin{tikzpicture}
-				\begin{axis}[
-					width=\linewidth,
-					height=5cm,
-					xlabel={local\_work\_size},
-					ylabel={Kernelzeit in [ms]},
-					ymajorgrids=true,
-					]
-					
-					\addplot[
-					color=blue,
-					mark=*,
-					]
-					coordinates {
-						(1, 3.1232)
-						(16, 1.444864)
-						(32, 1.457152)
-						(48, 1.46432)
-						(64, 1.476608)
-						(80, 1.50224)
-						(96, 1.57696)
-						(112, 1.696768)
-						(128, 1.453056)
-						(144, 1.442816)
-						(160, 1.496064)
-						(176, 1.53088)
-						(192, 1.549312)
-						(208, 1.570784)
-						(224, 1.601536)
-						(240, 1.696768)
-						(256, 1.788928)
-						(272, 1.987584)
-						(288, 2.085888)
-						(304, 2.149376)
-						(320, 2.249696)
-						(336, 2.335744)
-						(352, 2.43712)
-						(368, 2.54768)
-						(384, 2.656256)
-						(400, 2.825216)
-						(416, 2.924544)
-						(432, 2.973696)
-						(448, 3.076096)
-						(464, 3.183616)
-						(480, 3.29216)
-						(496, 3.407872)
-						(512, 3.505152)
-						(528, 3.664896)
-						(544, 3.769376)
-						(560, 3.83488)
-						(576, 3.941376)
-						(592, 4.048896)
-						(608, 4.161536)
-						(624, 4.268032)
-						(640, 4.383776)
-						(656, 4.524)
-						(672, 4.62336)
-						(688, 4.722688)
-						(704, 4.827136)
-						(720, 4.939776)
-						(736, 5.045248)
-						(752, 5.159936)
-						(768, 5.266432)
-						(784, 5.405696)
-						(800, 5.511168)
-						(816, 5.61664)
-						(832, 5.728224)
-						(848, 5.842944)
-						(864, 5.955584)
-						(880, 6.086656)
-						(896, 6.1952)
-						(912, 6.33856)
-						(928, 6.452224)
-						(944, 6.559744)
-						(960, 6.680576)
-						(976, 6.797312)
-						(992, 6.926336)
-						(1008, 7.066624)
-						(1024, 7.195648)
-					};		
-				\end{axis}
-			\end{tikzpicture}
-			\caption{Kernelzeit in Abhängigkeit der local\_work\_size für ein konstantes $m=10000$.  }
-			\label{fig:data2}
-		\end{figure}
-		
-		Es ist zu erkennen das für eine möglichst geringe Kernellaufzeit hier eine local\_work\_size zwischen 4 und 160 gewählt werden sollte.
-		Diese ergibt sich aus der Hardware und Architektur dieser. 
-		Faktoren die dies in Kombination mit obigen beeinflussen können sind z.B. Speicherzugriffe.
-		Je nach dem können zu viele oder zu wenige Threads einen Overhead erzeugen in dem die Hardware nicht mit ihrer vollen Kapazität genutzt wird.
 	\end{task}
 
 
