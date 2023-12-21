@@ -14,7 +14,7 @@ public class Main {
         int rank = MPI.COMM_WORLD.Rank();
         int size = MPI.COMM_WORLD.Size();
 
-        int d = Integer.toInt(args[0]);
+        int d = 1;//Integer.toInt(args[0]);
 
         // Verprobung?: lokale Blockgröße 2
         int p = (int) Math.sqrt(size);
