@@ -2,6 +2,7 @@ package de.hsi.matmat;
 
 import mpi.MPI;
 
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -99,8 +100,8 @@ public class Main {
 
 
         MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a, 0, d * d, MPI.FLOAT, MPI.HOST);
-        //MPI.COMM_WORLD.Scatter(global_b, 0, d * d * p * p, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
-        //MPI.COMM_WORLD.Scatter(global_c, 0, d * d * p * p, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
+        //MPI.COMM_WORLD.Scatter(global_b, 0, d * d, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
+        //MPI.COMM_WORLD.Scatter(global_c, 0, d * d, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
         // STEP INIT
         //int send_to_rank_a = rank_x - rank_y >= 0 ? rank - rank_y : rank - rank_y + p;
@@ -116,10 +117,14 @@ public class Main {
         //int px = (p * p + rank_x - rank_y) % (p * p);
         //int qx = (p * p + rank_y - rank_x) % (p * p);
 
-        //MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, offset, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Gather(local_a, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
 
 
-        System.out.println("C = AB + C:");
+        if (rank == MPI.HOST) {
+            printMatrix(global_a);
+        }
+
+        //System.out.println("C = AB + C:");
         //printMatrix(E, n, p);
         MPI.Finalize();
 
@@ -226,6 +231,10 @@ public class Main {
             }
             System.out.println();
         }
+    }
+
+    public static void printMatrix(float[] mat) {
+        System.out.println(Arrays.toString(mat));
     }
 
 }
