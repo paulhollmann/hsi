@@ -21,12 +21,9 @@ public class Main {
         float[][] B;
         float[][] C;
 
-        float[] global_a = new float[0];
-        float[] global_b = new float[0];
-        float[] global_c = new float[0];
-        global_a = new float[p * p * d * d];
-        global_b = new float[p * p * d * d];
-        global_c = new float[p * p * d * d];
+        float[] global_a = new float[p * p * d * d];
+        float[] global_b = new float[p * p * d * d];
+        float[] global_c = new float[p * p * d * d];
 
         if (rank == MPI.HOST) {
             A = new float[p * p][d * d]; // [[1,1,1,1], [2,2,2,2], [3,3,3,3], [4,4,4,4]] für p = 2 und d = 2
@@ -101,7 +98,7 @@ public class Main {
         int rank_x = rank - rank_y * p;
 
 
-        MPI.COMM_WORLD.Scatter(global_a, 0, d * d * p * p, MPI.FLOAT, local_a, 0, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a, 0, d * d, MPI.FLOAT, MPI.HOST);
         //MPI.COMM_WORLD.Scatter(global_b, 0, d * d * p * p, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
         //MPI.COMM_WORLD.Scatter(global_c, 0, d * d * p * p, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
