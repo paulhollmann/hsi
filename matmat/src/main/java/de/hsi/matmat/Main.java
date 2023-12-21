@@ -10,12 +10,11 @@ public class Main {
     public static void main(String[] args)
     {
         String appArgs[] = MPI.Init(args);
-        System.out.println(Arrays.toString(appArgs));
 
         int rank = MPI.COMM_WORLD.Rank();
         int size = MPI.COMM_WORLD.Size();
 
-        int d = 1;//Integer.toInt(args[0]);
+        int d = Integer.toInt(appArgs[0]);
 
         // Verprobung?: lokale Blockgröße 2
         int p = (int) Math.sqrt(size);
@@ -46,27 +45,22 @@ public class Main {
 
             System.out.println("C = AB * C:");
             printMatrix(D, n, p);
-
-
-            System.out.println("Usage of MPI ------------------");
-
         }
 
         MPI.COMM_WORLD.Barrier();
 
         if (rank == 0)
         {
-            System.out.println("NUM_OF_PROCESSORS: " + MPI.NUM_OF_PROCESSORS);
-            System.out.println("HOST: " + MPI.HOST);
-            System.out.println("SIZE: " + MPI.COMM_WORLD.Size());
-            System.out.println("RANK: " + MPI.COMM_WORLD.Rank());
+            System.out.println("Usage of MPI, I am Host, Size is  " + MPI.COMM_WORLD.Size() + " ------------------");
 
-
+            
 
         }
         else
         {
             System.out.println("Hello World! I am number <"+ (rank + 1) + "/" + size + ">\n");
+
+
         }
         MPI.COMM_WORLD.Barrier();
 
