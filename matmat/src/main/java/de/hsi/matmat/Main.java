@@ -64,6 +64,8 @@ public class Main {
         {
             System.out.println("Hello World! I am number <"+ (rank + 1) + "/" + size + ">\n");
         }
+        MPI.COMM_WORLD.Barrier();
+
         var E = getCannonIteration(A, B, C);
         MPI.Finalize();
 
