@@ -8,21 +8,19 @@ public class Main {
 
     public static void main(String[] args)
     {
-        var n = 6;
-        // Verprobung?: lokale Blockgröße 2
-        var p = 6;
-
-        assert(n % p == 0);
-        //Noch bessere Implementation der Verblockung
-
-        MPI.Init(args);
+        String appArgs[] = MPI.Init(args);
+        System.out.println(Arrays.toString(appArgs));
 
         int rank = MPI.COMM_WORLD.Rank();
         int size = MPI.COMM_WORLD.Size();
 
-        if (rank == 0) {
-            var d = n / p;
+        var d = args[0];
 
+        // Verprobung?: lokale Blockgröße 2
+        var p = Math.sqrt(size);
+        var n = p * d;
+
+        if (rank == 0) {
             var A = new int[p * p][d * d];
             var B = new int[p * p][d * d];
             var C = new int[p * p][d * d];
@@ -34,7 +32,6 @@ public class Main {
                 for (int j = 0; j < d * d; j++) {
                     A[i][j] = i + 1;// r.nextInt(100);
                     B[i][j] = i + 1;//r.nextInt(100);
-                    //C[i][j] = 0;
                 }
             }
             System.out.println("A :");
@@ -56,14 +53,15 @@ public class Main {
 
         MPI.COMM_WORLD.Barrier();
 
-
         if (rank == 0)
         {
-            System.out.println("Name: " + MPI.Get_processor_name());
             System.out.println("NUM_OF_PROCESSORS: " + MPI.NUM_OF_PROCESSORS);
             System.out.println("HOST: " + MPI.HOST);
             System.out.println("SIZE: " + MPI.COMM_WORLD.Size());
             System.out.println("RANK: " + MPI.COMM_WORLD.Rank());
+
+
+
         }
         else
         {
