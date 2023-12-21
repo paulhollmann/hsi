@@ -162,7 +162,7 @@ public class Main {
             MPI.COMM_WORLD.Barrier();
             MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
             if (rank == MPI.HOST) {
-                printMatrix(global_c,d,p);
+                printMatrix(global_c, d, p);
                 System.out.println("Iteration ----------------------------------------------");
             }
             MPI.COMM_WORLD.Barrier();
@@ -173,7 +173,7 @@ public class Main {
 
 
         if (rank == MPI.HOST) {
-            printMatrix(global_c,);
+            printMatrix(global_c, d, p);
         }
 
         //System.out.println("C = AB + C:");
