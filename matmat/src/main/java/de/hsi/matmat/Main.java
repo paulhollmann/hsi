@@ -49,6 +49,10 @@ public class Main {
         System.out.println("Usage of MPI ------------------");
 
         MPI.Init(args);
+
+
+        MPI.COMM_WORLD.Barrier();
+
         int rank = MPI.COMM_WORLD.Rank();
         int size = MPI.COMM_WORLD.Size();
 
@@ -202,6 +206,21 @@ public class Main {
         }
 
         return matC;
+    }
+
+    public static boolean verify(float[] vec_a, float[] vec_b, float diff){
+        boolean good = vec_a.length == vec_b.length;
+        int count = 0;
+        for (int i = 0; i < vec_a.length; i++) {
+            if(Math.abs(vec_a[i] - vec_b[i]) > diff) {
+                good = false;
+                System.out.println("diff at i=" + i +" of " + (vec_a[i] - vec_b[i]) );
+                count++;
+                if(count > 5) break;
+            }
+        }
+        //System.out.println("Vectors of length " + vec_b.length + " match" + (good ? "":" not") + " to " + diff);
+        return good;
     }
 
     public static void printMatrix(int[][] mat, int n, int p){
