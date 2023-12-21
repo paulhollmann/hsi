@@ -118,10 +118,10 @@ public class Main {
         int tag = 1;
 
         var req = MPI.COMM_WORLD.Isend(local_a, 0, d * d, MPI.FLOAT, send_to_rank_a, tag);
-        System.out.println("Rank " + rank + " sends " + Arrays.toString(local_a) + " rank " + send_to_rank_a);
+        System.out.println("Rank " + rank + " sends " + Arrays.toString(local_a) + " to rank " + send_to_rank_a);
 
-        MPI.COMM_WORLD.Recv(local_a_, 0, d * d, MPI.FLOAT, receive_from_rank_a, tag);
-        System.out.println("Rank " + rank + " receives " + Arrays.toString(local_a_) + " rank " + receive_from_rank_a);
+        MPI.COMM_WORLD.Recv(local_a, 0, d * d, MPI.FLOAT, receive_from_rank_a, tag);
+        System.out.println("Rank " + rank + " receives " + Arrays.toString(local_a) + " from rank " + receive_from_rank_a);
 
         req.Wait();
         /*for (int i = 1; i < p; i++) {
