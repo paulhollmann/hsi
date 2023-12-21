@@ -100,9 +100,9 @@ public class Main {
         int rank_x = rank - rank_y * p;
 
 
-        MPI.COMM_WORLD.Scatter(global_a, 0, d * d * p * p, MPI.FLOAT, local_a, offset, d * d, MPI.FLOAT, MPI.HOST);
-        MPI.COMM_WORLD.Scatter(global_b, 0, d * d * p * p, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
-        MPI.COMM_WORLD.Scatter(global_c, 0, d * d * p * p, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
+        //MPI.COMM_WORLD.Scatter(global_a, 0, d * d * p * p, MPI.FLOAT, local_a, offset, d * d, MPI.FLOAT, MPI.HOST);
+        //MPI.COMM_WORLD.Scatter(global_b, 0, d * d * p * p, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
+        //MPI.COMM_WORLD.Scatter(global_c, 0, d * d * p * p, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
         // STEP INIT
         //int send_to_rank_a = rank_x - rank_y >= 0 ? rank - rank_y : rank - rank_y + p;
@@ -121,10 +121,25 @@ public class Main {
         //MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
 
-        System.out.println("C = AB * C:");
+        System.out.println("C = AB + C:");
         //printMatrix(E, n, p);
         MPI.Finalize();
 
+    }
+
+    public static float[] getMatMul(float[] matA, float[] matB, float[] matC) {
+        int n = (int) Math.sqrt(matA.length);
+        // matmul aka matC[y * p + x][0] += matA[y * p + x][0] * matB[y * p + x][0];
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
+                float res = 0;
+                for (int xy = 0; xy < n; xy++) {
+                    res += matA[y * n + xy] * matB[xy * n + x];
+                }
+                matC[y * n + x] += res;
+            }
+        }
+        return matC;
     }
 
     public static float[][] getCannonIteration(float[][] matA, float[][] matB, float[][] matC) {
