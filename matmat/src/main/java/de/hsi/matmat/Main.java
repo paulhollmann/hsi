@@ -2,6 +2,7 @@ package de.hsi.matmat;
 
 import mpi.*;
 import java.util.Random;
+import java.util.Arrays;
 
 
 public class Main {
