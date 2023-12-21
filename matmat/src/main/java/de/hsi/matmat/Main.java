@@ -100,7 +100,7 @@ public class Main {
 
         int iteration = 1;
 
-        MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a[0], 0, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a[1], 0, d * d, MPI.FLOAT, MPI.HOST);
         //MPI.COMM_WORLD.Scatter(global_b, 0, d * d, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
         //MPI.COMM_WORLD.Scatter(global_c, 0, d * d, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
