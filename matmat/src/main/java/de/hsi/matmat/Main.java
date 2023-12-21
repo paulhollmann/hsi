@@ -118,6 +118,8 @@ public class Main {
         int tag = 1;
 
         var req = MPI.COMM_WORLD.Isend(local_a, 0, d * d, MPI.FLOAT, send_to_rank_a, tag);
+        System.out.println("Rank " + rank + " sends " + local_a[0] + " rank " + send_to_rank_a);
+
         MPI.COMM_WORLD.Recv(local_a_, 0, d * d, MPI.FLOAT, recive_to_rank_a, tag);
 
         req.Wait();
