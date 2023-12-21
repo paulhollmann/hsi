@@ -111,13 +111,24 @@ public class Main {
         //MPI.COMM_WORLD.Recv(local_a, )
 
 
+        int send_to_rank_a = rank + (rank_x - 1 >= 0 ? 0 : p) - 1;
+        int recive_to_rank_a = rank - (rank_x + 1 < p ? 0 : p) + 1;
+
+        int tag = 1;
+
+        MPI.COMM_WORLD.Bsend(local_a, 0, d * d, MPI.FLOAT, send_to_rank_a, tag);
+        MPI.COMM_WORLD.Recv(local_a, 0, d * d, MPI.FLOAT, recive_to_rank_a, tag);
+
         /*for (int i = 1; i < p; i++) {
 
         }*/
         //int px = (p * p + rank_x - rank_y) % (p * p);
         //int qx = (p * p + rank_y - rank_x) % (p * p);
 
-        MPI.COMM_WORLD.Gather(local_a, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
+        local_c = local_a;
+
+
+        MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
 
 
         if (rank == MPI.HOST) {
