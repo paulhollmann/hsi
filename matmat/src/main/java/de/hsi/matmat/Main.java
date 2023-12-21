@@ -91,6 +91,7 @@ public class Main {
         MPI.COMM_WORLD.Barrier();
 
         float[] local_a = new float[d * d];
+        float[] local_a_ = new float[d * d];
         float[] local_b = new float[d * d];
         float[] local_c = new float[d * d];
 
@@ -116,16 +117,17 @@ public class Main {
 
         int tag = 1;
 
-        MPI.COMM_WORLD.Bsend(local_a, 0, d * d, MPI.FLOAT, send_to_rank_a, tag);
-        MPI.COMM_WORLD.Recv(local_a, 0, d * d, MPI.FLOAT, recive_to_rank_a, tag);
+        var req = MPI.COMM_WORLD.Isend(local_a, 0, d * d, MPI.FLOAT, send_to_rank_a, tag);
+        MPI.COMM_WORLD.Recv(local_a_, 0, d * d, MPI.FLOAT, recive_to_rank_a, tag);
 
+        req.Wait();
         /*for (int i = 1; i < p; i++) {
 
         }*/
         //int px = (p * p + rank_x - rank_y) % (p * p);
         //int qx = (p * p + rank_y - rank_x) % (p * p);
 
-        local_c = local_a;
+        local_c = local_a_;
 
 
         MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
