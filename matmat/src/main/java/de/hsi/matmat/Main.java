@@ -284,13 +284,16 @@ public class Main {
     }
 
     public static void printMatrix(float[] mat, int d, int p) {
-        for (int y = 0; y < d; y++) {
-            for (int i = 0; i < p * p; i++) {
-                int offset = i * d * d;
-                System.out.print("| ");
-                for (int x = 0; x < d; x++) {
-                    System.out.print(mat[offset + y * d + x] + " ");
+        for (int j = 0; j < p; j++) {
+            for (int y = 0; y < d; y++) {
+                for (int i = 0; i < p; i++) {
+                    System.out.print("| ");
+                    int offset = j * p * d * d + i * d;
+                    for (int x = 0; x < d; x++) {
+                        System.out.print(mat[offset + y * d + x] + " ");
+                    }
                 }
+                System.out.print(" \n");
             }
             System.out.print(" \n");
         }
