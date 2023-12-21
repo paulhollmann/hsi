@@ -14,11 +14,11 @@ public class Main {
         int rank = MPI.COMM_WORLD.Rank();
         int size = MPI.COMM_WORLD.Size();
 
-        var d = Integer.toInt(args[0]);
+        int d = Integer.toInt(args[0]);
 
         // Verprobung?: lokale Blockgröße 2
-        var p = Math.sqrt(size);
-        var n = p * d;
+        int p = Math.sqrt(size);
+        int n = p * d;
 
         if (rank == 0) {
             var A = new int[p * p][d * d];
