@@ -137,6 +137,7 @@ public class Main {
                 printMatrix(global_c);
                 System.out.println("Iteration ----------------------------------------------");
             }
+            MPI.COMM_WORLD.Barrier();
         }
         //int px = (p * p + rank_x - rank_y) % (p * p);
         //int qx = (p * p + rank_y - rank_x) % (p * p);
