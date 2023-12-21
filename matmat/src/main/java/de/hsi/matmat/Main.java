@@ -101,7 +101,7 @@ public class Main {
         int rank_x = rank - rank_y * p;
 
 
-        MPI.COMM_WORLD.Scatter(global_a, 0, d * d * p * p, MPI.FLOAT, local_a, offset, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Scatter(global_a, 0, d * d * p * p, MPI.FLOAT, local_a, offset, d * d, MPI.FLOAT, 0);
         //MPI.COMM_WORLD.Scatter(global_b, 0, d * d * p * p, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
         //MPI.COMM_WORLD.Scatter(global_c, 0, d * d * p * p, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
