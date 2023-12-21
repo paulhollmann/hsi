@@ -142,14 +142,13 @@ public class Main {
             //System.out.println("Rank " + rank + " receives B" + Arrays.toString(local_b[local_in]) + " from rank " + receive_from_rank_b);
 
 
-            final int d2 = d * d;
-            for (int y = 0; y < d2; y++) {
-                for (int x = 0; x < d2; x++) {
+            for (int y = 0; y < d; y++) {
+                for (int x = 0; x < d; x++) {
                     float res = 0.f;
-                    for (int xy = 0; xy < d2; xy++) {
-                        res += local_a[local_in][y * d2 + xy] * local_b[local_in][xy * d2 + x];
+                    for (int xy = 0; xy < d; xy++) {
+                        res += local_a[local_in][y * d + xy] * local_b[local_in][xy * d + x];
                     }
-                    local_c[y * d2 + x] += res;
+                    local_c[y * d + x] += res;
                 }
             }
 
