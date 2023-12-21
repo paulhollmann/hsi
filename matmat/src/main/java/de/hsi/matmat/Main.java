@@ -296,8 +296,9 @@ public class Main {
                 System.out.print(" \n");
             }
             for (int t = 0; t < d * p; t++) {
-                System.out.print("--- + ");
+                System.out.print("+ --- ");
             }
+            System.out.print(" \n");
         }
     }
 
