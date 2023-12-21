@@ -14,7 +14,7 @@ public class Main {
         int rank = MPI.COMM_WORLD.Rank();
         int size = MPI.COMM_WORLD.Size();
 
-        var d = args[0];
+        var d = Integer.toInt(args[0]);
 
         // Verprobung?: lokale Blockgröße 2
         var p = Math.sqrt(size);
