@@ -1,6 +1,7 @@
 package de.hsi.matmat;
 
 import mpi.MPI;
+import mpi.Request;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -11,20 +12,20 @@ public class Main {
     public static void main(String[] args) {
         String[] appArgs = MPI.Init(args);
 
-        int rank = MPI.COMM_WORLD.Rank();
-        int size = MPI.COMM_WORLD.Size();
+        final int rank = MPI.COMM_WORLD.Rank();
+        final int size = MPI.COMM_WORLD.Size();
 
-        int d = Integer.parseInt(appArgs[0]);
-        int p = (int) Math.sqrt(size);
-        int n = p * d;
+        final int d = Integer.parseInt(appArgs[0]);
+        final int p = (int) Math.sqrt(size);
+        final int n = p * d;
 
         float[][] A;
         float[][] B;
         float[][] C;
 
-        float[] global_a = new float[p * p * d * d];
-        float[] global_b = new float[p * p * d * d];
-        float[] global_c = new float[p * p * d * d];
+        final float[] global_a = new float[p * p * d * d];
+        final float[] global_b = new float[p * p * d * d];
+        final float[] global_c = new float[p * p * d * d];
 
         if (rank == MPI.HOST) {
             A = new float[p * p][d * d]; // [[1,1,1,1], [2,2,2,2], [3,3,3,3], [4,4,4,4]] für p = 2 und d = 2
@@ -90,17 +91,16 @@ public class Main {
         }
         MPI.COMM_WORLD.Barrier();
 
-        float[] local_a = new float[d * d];
-        float[] local_a_ = new float[d * d];
-        float[] local_b = new float[d * d];
+        float[][] local_a = new float[2][d * d];
+        float[][] local_b = new float[2][d * d];
         float[] local_c = new float[d * d];
 
-        int offset = rank * d * d;
-        int rank_y = rank / p;
-        int rank_x = rank - rank_y * p;
+        final int rank_y = rank / p;
+        final int rank_x = rank - rank_y * p;
 
+        int iteration = 1;
 
-        MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a, 0, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a[0], 0, d * d, MPI.FLOAT, MPI.HOST);
         //MPI.COMM_WORLD.Scatter(global_b, 0, d * d, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
         //MPI.COMM_WORLD.Scatter(global_c, 0, d * d, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
@@ -112,25 +112,26 @@ public class Main {
         //MPI.COMM_WORLD.Recv(local_a, )
 
 
-        int send_to_rank_a = rank + (rank_x - 1 >= 0 ? 0 : p) - 1;
-        int receive_from_rank_a = rank - (rank_x + 1 < p ? 0 : p) + 1;
+        for (; iteration < p; iteration++) {
+            final int local_out = iteration % 2 == 1 ? 1 : 0;
+            final int local_in = iteration % 2 == 0 ? 1 : 0;
 
-        int tag = 1;
 
-        var req = MPI.COMM_WORLD.Isend(local_a, 0, d * d, MPI.FLOAT, send_to_rank_a, tag);
-        System.out.println("Rank " + rank + " sends " + Arrays.toString(local_a) + " to rank " + send_to_rank_a);
+            final int send_to_rank_a = rank + (rank_x - 1 >= 0 ? 0 : p) - 1;
+            final int receive_from_rank_a = rank - (rank_x + 1 < p ? 0 : p) + 1;
 
-        MPI.COMM_WORLD.Recv(local_a, 0, d * d, MPI.FLOAT, receive_from_rank_a, tag);
-        System.out.println("Rank " + rank + " receives " + Arrays.toString(local_a) + " from rank " + receive_from_rank_a);
+            Request req_a = MPI.COMM_WORLD.Isend(local_a[local_out], 0, d * d, MPI.FLOAT, send_to_rank_a, iteration);
+            System.out.println("Rank " + rank + " sends A" + Arrays.toString(local_a[local_out]) + " to rank " + send_to_rank_a);
 
-        req.Wait();
-        /*for (int i = 1; i < p; i++) {
+            MPI.COMM_WORLD.Recv(local_a[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_a, iteration);
+            System.out.println("Rank " + rank + " receives A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
 
-        }*/
+            req_a.Wait();
+        }
         //int px = (p * p + rank_x - rank_y) % (p * p);
         //int qx = (p * p + rank_y - rank_x) % (p * p);
 
-        local_c = local_a_;
+        local_c = local_a[iteration % 2 == 1 ? 1 : 0];
 
 
         MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
