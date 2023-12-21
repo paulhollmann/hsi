@@ -15,46 +15,47 @@ public class Main {
         assert(n % p == 0);
         //Noch bessere Implementation der Verblockung
 
-        var d = n/p;
-
-        var A = new int[p*p][d*d];
-        var B = new int[p*p][d*d];
-        var C = new int[p*p][d*d];
-
-        Random r = new Random(187);
-
-        // Generator für Matrixbelegung
-        for(int i = 0; i < p*p; i++)
-        {
-            for(int j = 0; j < d*d; j++)
-            {
-                A[i][j] = i+1;// r.nextInt(100);
-                B[i][j] = i+1;//r.nextInt(100);
-                //C[i][j] = 0;
-            }
-        }
-        System.out.println("A :");
-        printMatrix(A, n, p);
-        System.out.println("B :");
-        printMatrix(B, n, p);
-        System.out.println("C :");
-        printMatrix(C, n, p);
-
-        var D = getCannonIteration(A, B, C);
-
-        System.out.println("C = AB * C:");
-        printMatrix(D, n, p);
-
-
-        System.out.println("Usage of MPI ------------------");
-
         MPI.Init(args);
-
-
-        MPI.COMM_WORLD.Barrier();
 
         int rank = MPI.COMM_WORLD.Rank();
         int size = MPI.COMM_WORLD.Size();
+
+        if (rank == 0) {
+            var d = n / p;
+
+            var A = new int[p * p][d * d];
+            var B = new int[p * p][d * d];
+            var C = new int[p * p][d * d];
+
+            Random r = new Random(187);
+
+            // Generator für Matrixbelegung
+            for (int i = 0; i < p * p; i++) {
+                for (int j = 0; j < d * d; j++) {
+                    A[i][j] = i + 1;// r.nextInt(100);
+                    B[i][j] = i + 1;//r.nextInt(100);
+                    //C[i][j] = 0;
+                }
+            }
+            System.out.println("A :");
+            printMatrix(A, n, p);
+            System.out.println("B :");
+            printMatrix(B, n, p);
+            System.out.println("C :");
+            printMatrix(C, n, p);
+
+            var D = getCannonIteration(A, B, C);
+
+            System.out.println("C = AB * C:");
+            printMatrix(D, n, p);
+
+
+            System.out.println("Usage of MPI ------------------");
+
+        }
+
+        MPI.COMM_WORLD.Barrier();
+
 
         if (rank == 0)
         {
@@ -70,7 +71,9 @@ public class Main {
         }
         MPI.COMM_WORLD.Barrier();
 
-        var E = getCannonIteration(A, B, C);
+        //var E = getCannonIteration(A, B, C);
+        System.out.println("C = AB * C:");
+        //printMatrix(E, n, p);
         MPI.Finalize();
 
     }
