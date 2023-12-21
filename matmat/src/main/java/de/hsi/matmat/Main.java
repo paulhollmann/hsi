@@ -3,7 +3,6 @@ package de.hsi.matmat;
 import mpi.MPI;
 import mpi.Request;
 
-import java.util.Arrays;
 import java.util.Random;
 
 
@@ -289,12 +288,13 @@ public class Main {
         for (int y = 0; y < d; y++) {
             for (int i = 0; i < p * p; i++) {
                 int offset = i * d * d;
+                System.out.print("| ");
                 for (int x = 0; x < d; x++) {
                     System.out.print(mat[offset + y * d + x] + " ");
                 }
             }
+            System.out.print(" \n");
         }
-        System.out.println(Arrays.toString(mat));
     }
 
 }
