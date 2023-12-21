@@ -19,7 +19,9 @@ public class Main {
         final int p = (int) Math.sqrt(size);
         final int n = p * d;
 
-        assert p * p == size;
+        if (p * p != size) {
+            System.exit(69);
+        }
 
         float[][] A;
         float[][] B;
@@ -118,20 +120,35 @@ public class Main {
             final int local_out = iteration % 2 == 1 ? 1 : 0;
             final int local_in = iteration % 2 == 0 ? 1 : 0;
 
+            final int tag_a = iteration * 2 + 1;
+            final int tag_b = iteration * 2 + 2;
+
 
             final int send_to_rank_a = rank + (rank_x - 1 >= 0 ? 0 : p) - 1;
+            final int send_to_rank_b = rank + (rank_y - 1 >= 0 ? 0 : p * p) - p;
             final int receive_from_rank_a = rank - (rank_x + 1 < p ? 0 : p) + 1;
+            final int receive_from_rank_b = rank - (rank_y + 1 < p ? 0 : p * p) + p;
 
-            Request req_a = MPI.COMM_WORLD.Isend(local_a[local_out], 0, d * d, MPI.FLOAT, send_to_rank_a, iteration);
-            System.out.println("Rank " + rank + " sends A" + Arrays.toString(local_a[local_out]) + " to rank " + send_to_rank_a);
+            Request req_a = MPI.COMM_WORLD.Isend(local_a[local_out], 0, d * d, MPI.FLOAT, send_to_rank_a, tag_a);
+            //System.out.println("Rank " + rank + " sends A" + Arrays.toString(local_a[local_out]) + " to rank " + send_to_rank_a);
 
-            MPI.COMM_WORLD.Recv(local_a[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_a, iteration);
-            System.out.println("Rank " + rank + " receives A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
+            Request req_b = MPI.COMM_WORLD.Isend(local_b[local_out], 0, d * d, MPI.FLOAT, send_to_rank_b, tag_b);
+            System.out.println("Rank " + rank + " sends B" + Arrays.toString(local_b[local_out]) + " to rank " + send_to_rank_b);
+
+
+            MPI.COMM_WORLD.Recv(local_a[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_a, tag_a);
+            //System.out.println("Rank " + rank + " receives A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
+
+            MPI.COMM_WORLD.Recv(local_b[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_b, tag_b);
+            System.out.println("Rank " + rank + " receives B" + Arrays.toString(local_b[local_in]) + " from rank " + receive_from_rank_b);
+
 
             req_a.Wait();
+            req_b.Wait();
+
             // debug
             MPI.COMM_WORLD.Barrier();
-            local_c = local_a[local_in];
+            local_c = local_b[local_in];
             MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
             if (rank == MPI.HOST) {
                 printMatrix(global_c);
