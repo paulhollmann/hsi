@@ -100,9 +100,9 @@ public class Main {
         int rank_x = rank - rank_y * p;
 
 
-        MPI.COMM_WORLD.Scatter(global_a, MPI.HOST * d * d, d * d, MPI.FLOAT, local_a, offset, d * d, MPI.FLOAT, MPI.HOST);
-        MPI.COMM_WORLD.Scatter(global_b, MPI.HOST * d * d, d * d, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
-        MPI.COMM_WORLD.Scatter(global_c, MPI.HOST * d * d, d * d, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Scatter(global_a, 0, d * d * p * p, MPI.FLOAT, local_a, offset, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Scatter(global_b, 0, d * d * p * p, MPI.FLOAT, local_b, offset, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Scatter(global_c, 0, d * d * p * p, MPI.FLOAT, local_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
         // STEP INIT
         //int send_to_rank_a = rank_x - rank_y >= 0 ? rank - rank_y : rank - rank_y + p;
