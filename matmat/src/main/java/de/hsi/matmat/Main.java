@@ -118,7 +118,7 @@ public class Main {
         //int px = (p * p + rank_x - rank_y) % (p * p);
         //int qx = (p * p + rank_y - rank_x) % (p * p);
 
-        MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, offset, d * d, MPI.FLOAT, MPI.HOST);
+        //MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, offset, d * d, MPI.FLOAT, MPI.HOST);
 
 
         System.out.println("C = AB * C:");
