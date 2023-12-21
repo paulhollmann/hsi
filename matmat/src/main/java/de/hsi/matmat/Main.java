@@ -19,6 +19,8 @@ public class Main {
         final int p = (int) Math.sqrt(size);
         final int n = p * d;
 
+        assert p * p == size;
+
         float[][] A;
         float[][] B;
         float[][] C;
@@ -127,11 +129,17 @@ public class Main {
             System.out.println("Rank " + rank + " receives A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
 
             req_a.Wait();
+            // debug
+            MPI.COMM_WORLD.Barrier();
+            local_c = local_a[local_in];
+            MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
+            if (rank == MPI.HOST) {
+                printMatrix(global_c);
+                System.out.println("Iteration ----------------------------------------------");
+            }
         }
         //int px = (p * p + rank_x - rank_y) % (p * p);
         //int qx = (p * p + rank_y - rank_x) % (p * p);
-
-        local_c = local_a[iteration % 2 == 1 ? 1 : 0];
 
 
         MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
