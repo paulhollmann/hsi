@@ -113,14 +113,15 @@ public class Main {
 
 
         int send_to_rank_a = rank + (rank_x - 1 >= 0 ? 0 : p) - 1;
-        int recive_to_rank_a = rank - (rank_x + 1 < p ? 0 : p) + 1;
+        int receive_from_rank_a = rank - (rank_x + 1 < p ? 0 : p) + 1;
 
         int tag = 1;
 
         var req = MPI.COMM_WORLD.Isend(local_a, 0, d * d, MPI.FLOAT, send_to_rank_a, tag);
-        System.out.println("Rank " + rank + " sends " + local_a[0] + " rank " + send_to_rank_a);
+        System.out.println("Rank " + rank + " sends " + Arrays.toString(local_a) + " rank " + send_to_rank_a);
 
-        MPI.COMM_WORLD.Recv(local_a_, 0, d * d, MPI.FLOAT, recive_to_rank_a, tag);
+        MPI.COMM_WORLD.Recv(local_a_, 0, d * d, MPI.FLOAT, receive_from_rank_a, tag);
+        System.out.println("Rank " + rank + " receives " + Arrays.toString(local_a_) + " rank " + receive_from_rank_a);
 
         req.Wait();
         /*for (int i = 1; i < p; i++) {
@@ -136,7 +137,7 @@ public class Main {
 
 
         if (rank == MPI.HOST) {
-            printMatrix(global_a);
+            printMatrix(global_c);
         }
 
         //System.out.println("C = AB + C:");
