@@ -94,6 +94,11 @@ public class Main {
         }
         MPI.COMM_WORLD.Barrier();
 
+        printMatrix(global_a, d, p);
+
+        MPI.COMM_WORLD.Barrier();
+
+
         float[][] local_a = new float[2][d * d];
         float[][] local_b = new float[2][d * d];
         float[] local_c = new float[d * d];
@@ -283,7 +288,7 @@ public class Main {
         }
     }
 
-    public static void printMatrix(float[] mat, int d, int p) {
+    public static void printMatrix(final float[] mat, final int d, final int p) {
         for (int j = 0; j < p; j++) {
             for (int y = 0; y < d; y++) {
                 for (int i = 0; i < p; i++) {
@@ -296,7 +301,7 @@ public class Main {
                 System.out.print(" \n");
             }
             for (int t = 0; t < d * p; t++) {
-                System.out.print("+ --- ");
+                System.out.print(" ---- ");
             }
             System.out.print(" \n");
         }
