@@ -133,14 +133,25 @@ public class Main {
             //System.out.println("Rank " + rank + " sends A" + Arrays.toString(local_a[local_out]) + " to rank " + send_to_rank_a);
 
             Request req_b = MPI.COMM_WORLD.Isend(local_b[local_out], 0, d * d, MPI.FLOAT, send_to_rank_b, tag_b);
-            System.out.println("Rank " + rank + " sends B" + Arrays.toString(local_b[local_out]) + " to rank " + send_to_rank_b);
+            //System.out.println("Rank " + rank + " sends B" + Arrays.toString(local_b[local_out]) + " to rank " + send_to_rank_b);
 
 
             MPI.COMM_WORLD.Recv(local_a[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_a, tag_a);
             //System.out.println("Rank " + rank + " receives A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
 
             MPI.COMM_WORLD.Recv(local_b[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_b, tag_b);
-            System.out.println("Rank " + rank + " receives B" + Arrays.toString(local_b[local_in]) + " from rank " + receive_from_rank_b);
+            //System.out.println("Rank " + rank + " receives B" + Arrays.toString(local_b[local_in]) + " from rank " + receive_from_rank_b);
+
+            final int d2 = d * d;
+            for (int y = 0; y < d2; y++) {
+                for (int x = 0; x < d2; x++) {
+                    float res = 0.f;
+                    for (int xy = 0; xy < d2; xy++) {
+                        res += local_a[local_in][y * d2 + xy] * local_b[local_in][xy * d2 + x];
+                    }
+                    local_c[y * d2 + x] += res;
+                }
+            }
 
 
             req_a.Wait();
@@ -148,7 +159,6 @@ public class Main {
 
             // debug
             MPI.COMM_WORLD.Barrier();
-            local_c = local_b[local_in];
             MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
             if (rank == MPI.HOST) {
                 printMatrix(global_c);
