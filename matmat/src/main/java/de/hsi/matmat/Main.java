@@ -17,7 +17,7 @@ public class Main {
         int d = Integer.toInt(args[0]);
 
         // Verprobung?: lokale Blockgröße 2
-        int p = Math.sqrt(size);
+        int p = (int) Math.sqrt(size);
         int n = p * d;
 
         if (rank == 0) {
