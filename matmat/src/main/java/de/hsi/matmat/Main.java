@@ -24,6 +24,9 @@ public class Main {
         float[] global_a = new float[0];
         float[] global_b = new float[0];
         float[] global_c = new float[0];
+        global_a = new float[p * p * d * d];
+        global_b = new float[p * p * d * d];
+        global_c = new float[p * p * d * d];
 
         if (rank == MPI.HOST) {
             A = new float[p * p][d * d]; // [[1,1,1,1], [2,2,2,2], [3,3,3,3], [4,4,4,4]] für p = 2 und d = 2
@@ -69,9 +72,7 @@ public class Main {
                 }
             }
 
-            global_a = new float[p * p * d * d];
-            global_b = new float[p * p * d * d];
-            global_c = new float[p * p * d * d];
+
             for (int y = 0; y < n; y++) {
                 for (int x = 0; x < n; x++) {
                     var x_block = x / d;
