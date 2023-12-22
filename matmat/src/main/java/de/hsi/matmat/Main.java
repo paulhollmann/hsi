@@ -26,9 +26,19 @@ public class Main {
         float[][] B;
         float[][] C;
 
-        final float[] global_a = getMat(p, d); //new float[p * p * d * d];
-        final float[] global_b = getMat(p, d); //new float[p * p * d * d];
-        final float[] global_c = getMat(p, d); //new float[p * p * d * d];
+        final float[] global_a;
+        final float[] global_b;
+        final float[] global_c;
+
+        if (rank == MPI.HOST) {
+            global_a = getMat(p, d);
+            global_b = getMat(p, d);
+            global_c = getMat(p, d);
+        } else {
+            global_a = new float[p * p * d * d];
+            global_b = new float[p * p * d * d];
+            global_c = new float[p * p * d * d];
+        }
 
         if (false) {
             A = new float[p * p][d * d]; // [[1,1,1,1], [2,2,2,2], [3,3,3,3], [4,4,4,4]] für p = 2 und d = 2

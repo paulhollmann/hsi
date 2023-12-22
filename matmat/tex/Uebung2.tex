@@ -68,6 +68,21 @@ subtask=ruled %or plain
 	
 	
 	\begin{task}{Paralleler Algorithmus mit MPJ}
+		Um den Cannon-Algorithmus effizient mit $p \times p$ Prozessen ausführen zu können,
+		müssen die Matrixelemente der Matratzen $A$, $B$ und $C$ auf die einzelnen Prozesse aufgeteilt werden.
+		Die gesamten Matrizen werden dazu in einen eindimensionalen Array gespeichert. 
+		Die Indizierung für den $(x,y)$-ten Eintrag im $(i,j)$-ten Block lautet hierbei
+		\begin{equation*}
+			M_{xy}^{ij} = {M}_{u}^{\mathrm{ges}}~,~~\text{ wobei } u =jddp +idd + yd +x
+		\end{equation*}
+		in der Gesamt-Matrix.
+		
+		Mit der oben genannten Indizierung kann nun einfach vom Host-Prozess jede Teil-Matrix an die anderen propagiert werden,
+		dazu wird \texttt{MPI.COMM\_WORLD.Scatter} benutzt um die Einträge an die lokalen Zwischenspeicher zu senden.
+		Jeder Prozess verwaltet seine eigenen lokalen Daten in je zwei Einträgen für $A^{\mathrm{lkl}}$ und $B^{\mathrm{lkl}}$ und einen Eintrag für $C^{\mathrm{lkl}}$.
+		
+		Bei der initialen (und auch allen folgenden) Austauschoperation werden die Daten von $A^{\mathrm{lkl}}$ und $B^{\mathrm{lkl}}$ immer in das grade nicht verwendete Array empfangen und die zu senden aus dem entsprechend anderem.
+		Diese Sendoperationen werden alle immer non-blocking ausgeführt, somit wird der Befehl \texttt{Isend} benutzt.
 		
 		!!!!!
 	
@@ -107,44 +122,7 @@ subtask=ruled %or plain
 
 	\appendix
 	\section{Appendix}
-	\begin{table}[H]
-		\centering
-		\begin{tabular}{|c|c|c|c|}
-			\hline
-			$m$ & local\_ & \textbf{gws} & \textbf{kt} \\
-			\hline
-			10000 & 1 & 10000 & 3.1232 \\
-			10000 & 16 & 10000 & 1.444864 \\
-			10000 & 32 & 10016 & 1.457152 \\
-			10000 & 48 & 10032 & 1.46432 \\
-			10000 & 64 & 10048 & 1.476608 \\
-			10000 & 80 & 10000 & 1.50224 \\
-			10000 & 96 & 10080 & 1.57696 \\
-			10000 & 112 & 10080 & 1.696768 \\
-			10000 & 128 & 10112 & 1.453056 \\
-			10000 & 144 & 10080 & 1.442816 \\
-			10000 & 160 & 10080 & 1.496064 \\
-			10000 & 176 & 10032 & 1.53088 \\
-			10000 & 192 & 10176 & 1.549312 \\
-			10000 & 208 & 10192 & 1.570784 \\
-			10000 & 224 & 10080 & 1.601536 \\
-			10000 & 240 & 10080 & 1.696768 \\
-			10000 & 256 & 10240 & 1.788928 \\
-			10000 & 512 & 10240 & 3.505152 \\
-			10000 & 800 & 10400 & 5.511168 \\
-			10000 & 816 & 10608 & 5.61664 \\
-			10000 & 832 & 10816 & 5.728224 \\
-			10000 & 848 & 10176 & 5.842944 \\
-			10000 & 864 & 10368 & 5.955584 \\
-			10000 & 880 & 10560 & 6.086656 \\
-			10000 & 896 & 10752 & 6.1952 \\
-			10000 & 912 & 10032 & 6.33856 \\
-			10000 & 1024 & 10240 & 7.195648 \\
-			\hline
-		\end{tabular}
-		\caption{Daten-Tabelle zu \ref{fig:data2} (Auswahl).}
-		\label{tab:data2}
-	\end{table}
+	
 
 	
 	
