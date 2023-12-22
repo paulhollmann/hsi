@@ -29,8 +29,9 @@ export PATH=$MPJ_HOME/bin:$PATH
 for i in {1..8}; do
     for p in {1..64}; do
         d=$((250 * i))
-        filename="${logfile}perf_i_${i}.txt"
-        srun mpjrun.sh -np "$p"  out/matmat.jar "$d" "$filename"
+        np=$((p * p))
+        filename="${logfile}perf2_i_${i}.txt"
+        srun mpjrun.sh -np "$np"  out/matmat.jar "$d" "$filename"
     done
 done
 
