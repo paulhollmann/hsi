@@ -26,22 +26,20 @@ logfile="/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/logs/"
 export MPJ_HOME=/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/lib/mpj-v0_44
 export PATH=$MPJ_HOME/bin:$PATH
 
-#for i in {1..8}; do
-#    for p in {1..64}; do
-#        d=$((250 * i))
-#        np=$((p * p))
-#        filename="${logfile}perf2_i_${i}.txt"
-#        srun mpjrun.sh -np "$np"  out/matmat.jar "$d" "$filename"
-#    done
-#done
+for i in {1..8}; do
+    for p in {1..8}; do
+        d=$((250 * i))
+        np=$((p * p))
+        filename="${logfile}perf4_i_${i}.txt"
+        srun mpjrun.sh -np "$np"  out/matmat.jar "$d" "$filename"
+    done
+done
 
 
-filename="${logfile}perf3_n_512.txt"
+filename="${logfile}perf4_n_512.txt"
 srun mpjrun.sh -np "$((1*1))" out/matmat.jar "$((512 / 1))"  "$filename"
 srun mpjrun.sh -np "$((2*2))" out/matmat.jar "$((512 / 2))"  "$filename"
 srun mpjrun.sh -np "$((4*4))" out/matmat.jar "$((512 / 4))"  "$filename"
 srun mpjrun.sh -np "$((8*8))" out/matmat.jar "$((512 / 8))"  "$filename"
-srun mpjrun.sh -np "$((16*16))" out/matmat.jar "$((512 / 16))" "$filename"
-srun mpjrun.sh -np "$((32*32))" out/matmat.jar "$((512 / 32))" "$filename"
-srun mpjrun.sh -np "$((64*64))" out/matmat.jar "$((512 / 64))" "$filename"
+
 
