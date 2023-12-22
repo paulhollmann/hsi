@@ -3,13 +3,24 @@ package de.hsi.matmat;
 import mpi.MPI;
 import mpi.Request;
 
-import java.util.Random;
-
 
 public class Main {
 
     public static void main(String[] args) {
+
+        boolean print_active = false;
+        boolean append_to_file = true;
+        String file_name = "logs/perf.log";
+
+
         String[] appArgs = MPI.Init(args);
+
+        if (appArgs.length < 1) {
+            System.exit(69);
+        }
+        if (appArgs.length > 1) {
+            file_name = appArgs[1];
+        }
 
         final int rank = MPI.COMM_WORLD.Rank();
         final int size = MPI.COMM_WORLD.Size();
@@ -29,92 +40,37 @@ public class Main {
             System.exit(69);
         }
 
-        float[][] A;
-        float[][] B;
-        float[][] C;
-
         final float[] global_a;
         final float[] global_b;
         final float[] global_c;
+        float[] global_c_serial_result = new float[0];
 
         if (rank == MPI.HOST) {
-            global_a = getMat(p, d);
-            global_b = getMat(p, d);
-            global_c = getMat(p, d);
+            global_a = getGridMat(p, d);
+            global_b = getGridMat(p, d);
+            global_c = getGridMat(p, d);
         } else {
             global_a = new float[p * p * d * d];
             global_b = new float[p * p * d * d];
             global_c = new float[p * p * d * d];
         }
 
-        if (false) {
-            A = new float[p * p][d * d]; // [[1,1,1,1], [2,2,2,2], [3,3,3,3], [4,4,4,4]] für p = 2 und d = 2
-            B = new float[p * p][d * d];
-            C = new float[p * p][d * d];
+        // SERIAL TEST
+        long time_before_serial = 0;
+        long time_after_serial = 0;
+        if (rank == MPI.HOST) {
+            float[] global_a_s = convertMat(global_a, p, d, true);
+            float[] global_b_s = convertMat(global_a, p, d, true);
+            float[] global_c_s = convertMat(global_a, p, d, true);
 
-            Random r = new Random(187);
-
-            // Generator für Matrixbelegung
-            for (int i = 0; i < p * p; i++) {
-                for (int j = 0; j < d * d; j++) {
-                    A[i][j] = i + 1;// r.nextInt(100);
-                    B[i][j] = i + 1;//r.nextInt(100);
-                }
-            }
-            System.out.println("A :");
-            printMatrix(A, n, p);
-            System.out.println("B :");
-            printMatrix(B, n, p);
-            System.out.println("C :");
-            printMatrix(C, n, p);
+            time_before_serial = System.nanoTime();
+            global_c_serial_result = serialMatMul(global_a_s, global_b_s, global_c_s);
+            time_after_serial = System.nanoTime();
         }
-
-
-        if (false) {
-            //var D = getCannonIteration(A, B, C);
-
-            //System.out.println("C = AB * C:");
-            //printMatrix(D, n, p);
-
-
-            //System.out.println("Usage of MPI, I am Host, Size is  " + MPI.COMM_WORLD.Size() + " ------------------");
-
-            // Initialisierung mittels steigernder zyklischer Vertauschung
-            for (int i = 0; i < p; i++) { //block_rows (for A)
-                for (int j = 0; j < i; j++) { // amount of commutations
-                    var firstAColumnElem = A[i * p];
-                    var firstBRowElem = B[i];
-                    for (int k = 0; k < p - 1; k++) { //block_column elements (for A)
-                        A[i * p + k] = A[i * p + k + 1];
-                        B[k * p + i] = B[(k + 1) * p + i];
-                    }
-                    A[i * p + p - 1] = firstAColumnElem;
-                    B[(p - 1) * p + i] = firstBRowElem;
-                }
-            }
-
-
-            for (int y = 0; y < n; y++) {
-                for (int x = 0; x < n; x++) {
-                    var x_block = x / d;
-                    var y_block = y / d;
-                    var x_local = x - x_block * d;
-                    var y_local = y - y_block * d;
-                    global_a[y * p * d + x] = A[y_block * p + x_block][y_local * d + x_local];
-                    global_b[y * p * d + x] = B[y_block * p + x_block][y_local * d + x_local];
-                    global_c[y * p * d + x] = C[y_block * p + x_block][y_local * d + x_local];
-                }
-                System.out.println();
-            }
-
-        } else {
-            //MPI.COMM_WORLD.Barrier();
-            //System.out.println("Hello World! I am number <" + (rank + 1) + "/" + size + ">\n");
-        }
-
+        // SERIAL TEST END
 
         MPI.COMM_WORLD.Barrier();
-        if (rank == MPI.HOST) {
+        if (rank == MPI.HOST && print_active) {
             System.out.println("global_a=");
             printMatrix(global_a, d, p);
             System.out.println(".");
@@ -160,6 +116,8 @@ public class Main {
         iteration++;
         final long time_after_init = System.nanoTime();
 
+        Request req_a = null;
+        Request req_b = null;
         for (; iteration <= p; iteration++) {
             final int local_out = iteration % 2 == 1 ? 1 : 0;
             final int local_in = iteration % 2 == 0 ? 1 : 0;
@@ -187,18 +145,16 @@ public class Main {
             }
             //System.out.println("Rank " + rank + " sends A" + Arrays.toString(local_a[local_out]) + " to rank " + send_to_rank_a);
             //System.out.println("Rank " + rank + " sends B" + Arrays.toString(local_b[local_out]) + " to rank " + send_to_rank_b);
+            if (req_a != null) req_a.Wait();
+            if (req_a != null) req_b.Wait();
 
-            Request req_a = MPI.COMM_WORLD.Isend(local_a[local_out], 0, d * d, MPI.FLOAT, send_to_rank_a, tag_a);
-            Request req_b = MPI.COMM_WORLD.Isend(local_b[local_out], 0, d * d, MPI.FLOAT, send_to_rank_b, tag_b);
+            req_a = MPI.COMM_WORLD.Isend(local_a[local_out], 0, d * d, MPI.FLOAT, send_to_rank_a, tag_a);
+            req_b = MPI.COMM_WORLD.Isend(local_b[local_out], 0, d * d, MPI.FLOAT, send_to_rank_b, tag_b);
             MPI.COMM_WORLD.Recv(local_a[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_a, tag_a);
             MPI.COMM_WORLD.Recv(local_b[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_b, tag_b);
 
             //System.out.println("Rank " + rank + " received A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
             //System.out.println("Rank " + rank + " received B" + Arrays.toString(local_b[local_in]) + " from rank " + receive_from_rank_b);
-
-
-            req_a.Wait();
-            req_b.Wait();
         }
 
 
@@ -207,21 +163,25 @@ public class Main {
         final long time_final = System.nanoTime();
 
         if (rank == MPI.HOST) {
-            System.out.println("after iteration " + iteration + ": global_c=");
-            printMatrix(global_c, d, p);
-            System.out.println(" ");
-
+            if (print_active) {
+                System.out.println("after iteration " + iteration + ": global_c=");
+                printMatrix(global_c, d, p);
+                System.out.println(" ");
+            }
             double iteration_time = (double) (time_final - time_after_init) / 1e6;
             double total_time = (double) (time_final - time_before_init) / 1e6;
-            System.out.printf("completed in %f ms (total), %f ms (iteration only) %n", total_time, iteration_time);
+            double total_time_serial = (double) (time_after_serial - time_before_serial) / 1e6;
+            System.out.printf("completed in %f ms (total parallel), %f ms (iteration only), %f ms (serial) ", total_time, iteration_time, total_time_serial);
+            boolean good = verify(global_c_serial_result, convertMat(global_c, p, d, true), 1e-45f);
+            System.out.print(good ? "ok " : "NICHT ok");
+            if (append_to_file && good) {
+                FileHelper.appendToFile(file_name, String.format("%d %d %d %f %f %f \n", n, p, d, total_time, iteration_time, total_time_serial));
+            }
         }
-
-
         MPI.Finalize();
-
     }
 
-    public static float[] getMat(int p, int d) {
+    public static float[] getGridMat(int p, int d) {
         float[] mat = new float[p * p * d * d];
         for (int j = 0; j < p; j++) {
             for (int y = 0; y < d; y++) {
@@ -233,14 +193,11 @@ public class Main {
                 }
             }
         }
-
         return mat;
     }
 
-
-    public static float[] getMatMul(float[] matA, float[] matB, float[] matC) {
+    public static float[] serialMatMul(float[] matA, float[] matB, float[] matC) {
         int n = (int) Math.sqrt(matA.length);
-        // matmul aka matC[y * p + x][0] += matA[y * p + x][0] * matB[y * p + x][0];
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 float res = 0;
@@ -253,64 +210,31 @@ public class Main {
         return matC;
     }
 
-    public static float[][] getCannonIteration(float[][] matA, float[][] matB, float[][] matC) {
-        assert matA.length == matB.length && matA.length == matC.length;
-        int p = (int) Math.sqrt(matA.length);
-        int d = (int) Math.sqrt(matA[0].length);
-        int n = p * d;
-
-        // Initialisierung mittels steigernder zyklischer Vertauschung
-        for (int i = 0; i < p; i++) { //block_rows (for A)
-            for (int j = 0; j < i; j++) { // amount of commutations
-                var firstAColumnElem = matA[i * p];
-                var firstBRowElem = matB[i];
-                for (int k = 0; k < p - 1; k++) { //block_column elements (for A)
-                    matA[i * p + k] = matA[i * p + k + 1];
-                    matB[k * p + i] = matB[(k + 1) * p + i];
-                }
-                matA[i * p + p - 1] = firstAColumnElem;
-                matB[(p - 1) * p + i] = firstBRowElem;
-            }
-        }
-
-        System.out.println("A :");
-        printMatrix(matA, n, p);
-        System.out.println("B :");
-        printMatrix(matB, n, p);
-
-        // Cannon Iteration
-        for (int i = 0; i < p; i++) {
-            // Multiply Submatrix Axy*Bxy
-            for (int y = 0; y < p; y++) {
-                for (int x = 0; x < p; x++) {
-                    // matmul aka matC[y * p + x][0] += matA[y * p + x][0] * matB[y * p + x][0];
-                    for (int yy = 0; yy < d; yy++) {
-                        for (int xx = 0; xx < d; xx++) {
-                            float res = 0;
-                            for (int xy = 0; xy < d; xy++) {
-                                res += matA[y * p + x][yy * d + xy] * matB[y * p + x][xy * d + xx];
-                            }
-                            matC[y * p + x][yy * d + xx] += res;
+    public static float[] convertMat(final float[] mat, final int p, final int d, boolean has_grid) {
+        final int n = p * d;
+        float[] res = new float[n * n];
+        if (has_grid) {
+            int new_x = 0;
+            int new_y = 0;
+            for (int j = 0; j < p; j++) {
+                for (int y = 0; y < d; y++) {
+                    for (int i = 0; i < p; i++) {
+                        int offset = j * p * d * d + i * d * d;
+                        for (int x = 0; x < d; x++) {
+                            res[new_y * n + new_x] = mat[offset + y * d + x];
+                            new_x++;
                         }
                     }
+                    new_x = 0;
+                    new_y++;
                 }
             }
-
-            // einfache zyklische Vertauschung
-            for (int j = 0; j < p; j++) {
-                var firstAColumnElem = matA[j * p];
-                var firstBRowElem = matB[j];
-                for (int k = 0; k < p - 1; k++) {
-                    matA[j * p + k] = matA[j * p + k + 1];
-                    matB[k * p + j] = matB[(k + 1) * p + j];
-                }
-                matA[j * p + p - 1] = firstAColumnElem;
-                matB[(p - 1) * p + j] = firstBRowElem;
-            }
+        } else {
+            System.err.println("not impl");
         }
-
-        return matC;
+        return res;
     }
+
 
     public static boolean verify(float[] vec_a, float[] vec_b, float diff) {
         boolean good = vec_a.length == vec_b.length;
@@ -323,22 +247,7 @@ public class Main {
                 if (count > 5) break;
             }
         }
-        //System.out.println("Vectors of length " + vec_b.length + " match" + (good ? "":" not") + " to " + diff);
         return good;
-    }
-
-    public static void printMatrix(float[][] mat, int n, int p) {
-        var d = n / p;
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < n; x++) {
-                var x_block = x / d;
-                var y_block = y / d;
-                var x_local = x - x_block * d;
-                var y_local = y - y_block * d;
-                System.out.format("%2.0f ", mat[y_block * p + x_block][y_local * d + x_local]);
-            }
-            System.out.println();
-        }
     }
 
     public static void printMatrix(final float[] mat, final int d, final int p) {
