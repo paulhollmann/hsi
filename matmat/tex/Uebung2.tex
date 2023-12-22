@@ -68,8 +68,19 @@ subtask=ruled %or plain
 	
 	
 	\begin{task}{Paralleler Algorithmus mit MPJ}
+		Ziel der Veranstaltung ist das parallele Rechnen, heute mit MPI und damit mehreren Prozessen, die sich per Nachrichten verständigen.
+		Nach Installation des MPJ, also dem Java Ableger von MPI, ist es nur eine kleine Hürde MPJ in das Programm zu inkludieren und mit mehreren Prozessen zu starten.
+		Wichtigste Befehle sind dazu MPI.Init() und zum Ende MPI.finalize(). Die Daten des Prozessor-ranks, der Anzahl an Prozessen und viele Funktionen sind über den Communicator MPI.COMM\_WORLD bestimmt. Z.B. MPI.COMM\_WORLD.Size(); für die Prozessanzahl.
 		
-		!!!!!
+		Wir starten den Parallelen Teil indem eine Barrier auf den Host Thread wartet.
+		Die Daten der 3 Matrizen wurden im Host bereits Initialisiert und werden anschließend per Scatter verteilt.
+		
+		Entscheidenster Teil und wichtig zum Lernen ist das Senden von einem Prozess zu einem Anderen im zweiten Teilschritten von Cannon.
+		Hierzu muss eine passende Send oder receive Variable erst initialisiert werden. Die Funktionen brauchen zudem den richtigen Rank eines Prozessors fürs Senden und richtige Offsets für die Daten. Die Länge, also die Anzahl eines Datentyps sowie der Typ an sich müssen auch angegeben werden. Also für einen 3 mal 3 Teilblock sollten 9 Floats verschickt werden.
+		
+		Bevor am Ende jedes Cannon-Schritts alle Matrizen ihre Ergebnisse weitersenden können, muss der Communicator per Barrier alle Prozessen blockieren, sodass gleichzeitig gesendet wird und kein Zwischenergebnis verloren geht.
+		
+		Der Algorithmus endet mit dem Gather Befehl. Es muss eine komplette Matrix am Host Prozess abgerufen werden können.
 	
 	\end{task}
 	
