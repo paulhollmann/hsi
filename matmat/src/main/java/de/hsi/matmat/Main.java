@@ -18,6 +18,13 @@ public class Main {
         final int p = (int) Math.sqrt(size);
         final int n = p * d;
 
+        final float[][] local_a = new float[2][d * d];
+        final float[][] local_b = new float[2][d * d];
+        final float[] local_c = new float[d * d];
+
+        final int rank_y = rank / p;
+        final int rank_x = rank - rank_y * p;
+
         if (p * p != size) {
             System.exit(69);
         }
@@ -114,19 +121,12 @@ public class Main {
         }
         MPI.COMM_WORLD.Barrier();
 
-
-        float[][] local_a = new float[2][d * d];
-        float[][] local_b = new float[2][d * d];
-        float[] local_c = new float[d * d];
-
-        final int rank_y = rank / p;
-        final int rank_x = rank - rank_y * p;
+        final long time_before_init = System.nanoTime();
 
         final int initial_local_out = 0;
         MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a[initial_local_out], 0, d * d, MPI.FLOAT, MPI.HOST);
         MPI.COMM_WORLD.Scatter(global_b, 0, d * d, MPI.FLOAT, local_b[initial_local_out], 0, d * d, MPI.FLOAT, MPI.HOST);
         MPI.COMM_WORLD.Scatter(global_c, 0, d * d, MPI.FLOAT, local_c, 0, d * d, MPI.FLOAT, MPI.HOST);
-
 
         int iteration = 0;
         // STEP INIT
@@ -155,21 +155,10 @@ public class Main {
 
             req_a.Wait();
             req_b.Wait();
-
-            // debug
-            if (false) {
-                MPI.COMM_WORLD.Barrier();
-                MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
-                if (rank == MPI.HOST) {
-                    System.out.println("after init: global_c=");
-                    printMatrix(global_c, d, p);
-                    System.out.println(" ");
-                }
-                MPI.COMM_WORLD.Barrier();
-            }
         }
 
         iteration++;
+        final long time_after_init = System.nanoTime();
 
         for (; iteration <= p; iteration++) {
             final int local_out = iteration % 2 == 1 ? 1 : 0;
@@ -210,32 +199,24 @@ public class Main {
 
             req_a.Wait();
             req_b.Wait();
-
-            // debug
-            if (true) {
-                MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
-                if (rank == MPI.HOST) {
-                    System.out.println("after iteration " + iteration + ": global_c=");
-                    printMatrix(global_c, d, p);
-                    System.out.println(" ");
-                }
-                MPI.COMM_WORLD.Barrier();
-            }
         }
 
 
-        if (true) {
-            MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
-            if (rank == MPI.HOST) {
-                System.out.println("after iteration " + iteration + ": global_c=");
-                printMatrix(global_c, d, p);
-                System.out.println(" ");
-            }
-            MPI.COMM_WORLD.Barrier();
+        MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
+
+        final long time_final = System.nanoTime();
+
+        if (rank == MPI.HOST) {
+            System.out.println("after iteration " + iteration + ": global_c=");
+            printMatrix(global_c, d, p);
+            System.out.println(" ");
+
+            double iteration_time = (double) (time_final - time_after_init) / 1e6;
+            double total_time = (double) (time_final - time_before_init) / 1e6;
+            System.out.printf("completed in %f ms (total), %f ms (iteration only) %n", total_time, iteration_time);
         }
 
-        //System.out.println("C = AB + C:");
-        //printMatrix(E, n, p);
+
         MPI.Finalize();
 
     }
