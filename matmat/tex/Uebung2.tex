@@ -130,19 +130,17 @@ subtask=ruled %or plain
 
 	
 
-	\begin{task} {Erwartete Ergebnisse}
-		Für das Beispiel einer 6 $/times$6 Matrix auf einem Prozessorengitter von 3$/times$3 prüfen wir die Ergebnisse des parallelen Algorithmus auf dem Cluster mit der sequenziellen Berechnung.
+	\begin{task}{Ergebnisse}
+		
+		Für das Beispiel einer $6 \times 6$ Matrix auf einem Prozessgitter von $3 \times 3$ prüfen wir die Ergebnisse des parallelen Algorithmus auf dem Cluster mit der sequenziellen Berechnung.
+		Dazu müssen die beiden Ergebnismatrizen auf die gleiche Reihenfolge gebracht werden und im Anschluss können alle Einträge im Rahmen der float-Genauigkeit verglichen werden.
+		
 		
 		Um zu prüfen, wie viel uns die MPJ-Umsetzung als Speedup geliefert hat, messen wir verschiedene Laufzeiten.
-		Vorgegeben sind n aus $(n = 250 * p * i | i=1...8)$.
+		Vorgegeben sind $n$ aus $(n = 250 * p * i | i=1...8)$.
+		Wir betrachten dazu \autoref{fig:1}, hier sind für festes $i=1$ die Zeiten und Speedup für verschiedene $p$ angegeben.
 		
-		Tabelle mit Werten
-		
-		Nun wollen wir den Speed-up in Abhängigkeit der Prozessoren $p \in (1, 64)$ berechnen.
-		
-		versch Verteilung der Prozesse auf die verfügbaren Knoten, Proz und Kerne
-		
-		\begin{figure}[H]
+		\begin{figure}
 			\begin{tikzpicture}
 				\begin{axis}[
 					width=\linewidth,
@@ -150,7 +148,7 @@ subtask=ruled %or plain
 					xlabel={$n$},
 					ylabel={Zeit (in s)},
 					legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1},
-					ymode=log, % logarithmische Skala für die y-Achse
+					%ymode=log, % logarithmische Skala für die y-Achse
 					xtick=data,
 					xticklabels={
 						250,500,750,1000,1250,1500,1750,2000,2250,2500
@@ -192,17 +190,64 @@ subtask=ruled %or plain
 					\legend{total\_time\_mpi, total\_time\_serial}
 				\end{axis}
 			\end{tikzpicture}
+			\vspace{1cm}
+			\begin{tikzpicture}
+				\begin{axis}[
+					width=\linewidth,
+					height=10cm,
+					xlabel={$n$},
+					ylabel={$~$},
+					legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1},
+					%ymode=log, % logarithmische Skala für die y-Achse
+					xtick=data,
+					xticklabels={
+						250,500,750,1000,1250,1500,1750,2000,2250,2500
+					},
+					ymajorgrids=true,
+					enlargelimits=0.15,
+					]
+					
+					\addplot table [x=n, y=np, col sep=space] {
+						n np d total_time iteration_time total_time_serial speedup
+						250 1 250 75.174053 70.522816 42.850940 0.569
+						500 4 250 245.688419 241.032588 233.302618 0.950
+						750 9 250 405.646907 394.764730 858.676219 2.118
+						1000 16 250 494.231617 469.955544 1848.466915 3.741
+						1250 25 250 542.761112 512.193297 3953.194378 7.282
+						1500 36 250 594.218071 550.962515 6337.510202 10.667
+						1750 49 250 795.978417 748.914136 10582.444563 13.293
+						2000 64 250 1119.335352 1041.499844 15347.158819 13.723
+						2250 81 250 1351.718528 1250.672542 23303.131579 17.254
+						2500 100 250 1551.732666 1454.309952 29745.586409 19.178
+					};
+					
+					% Daten für total_time
+					\addplot table [x=n, y=speedup, col sep=space] {
+						n np d total_time iteration_time total_time_serial speedup
+						250 1 250 75.174053 70.522816 42.850940 0.569
+						500 4 250 245.688419 241.032588 233.302618 0.950
+						750 9 250 405.646907 394.764730 858.676219 2.118
+						1000 16 250 494.231617 469.955544 1848.466915 3.741
+						1250 25 250 542.761112 512.193297 3953.194378 7.282
+						1500 36 250 594.218071 550.962515 6337.510202 10.667
+						1750 49 250 795.978417 748.914136 10582.444563 13.293
+						2000 64 250 1119.335352 1041.499844 15347.158819 13.723
+						2250 81 250 1351.718528 1250.672542 23303.131579 17.254
+						2500 100 250 1551.732666 1454.309952 29745.586409 19.178
+					};
+			
+					
+					\legend{$p^2$,speedup}
+				\end{axis}
+			\end{tikzpicture}
 			\caption{Ausführungszeiten bei verschiedener Matrixgröße $n \times n$ bei fester Blockgröße $d \times d = 250 \times 250$.}
+			\label{fig:1}
 		\end{figure}
 		
 		
 		
 	\end{task}
 
-
-	\appendix
-	\section{Appendix}
-	
 
 	
 	
