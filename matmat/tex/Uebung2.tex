@@ -41,11 +41,22 @@ subtask=ruled %or plain
 	
 	In dieser Übung soll das Matrix-Matrix-Produkt von quadratischen Matrizen per Cannon-Algorithmus untersucht werden.
 	Für große Matrizen sind parallele Algorithmen häufig sinnvoll um die Rechenzeit zu kürzen.
-	
-	\begin{task}{Sequentieller Algorithmus der Cannon-Iteration}\label{task:1}
-		Ein paralleles Programm starten wir erstmal wieder mit der Entwicklung eines sequentiellen.
-		Als kleinen Zwischenschritt haben wir erst ohne Teilblöcke in der Matrix gearbeitet und später die Struktur der Matrix erweitert.
+	\begin{task}{Matrix-Matrix Multiplikation sequenziell}
+			Gegeben seien Matrizen $A = [a_{ij}]$, $B = [b_{ij}]$ und $C = [c_{ij}]$ der Größe $n \times n$.
+			Die Berechnung von $C$ gemäß der Gleichung $C = A \times B + C$ kann wie folgt in Summenschreibweise ausgedrückt werden: 
+			\[
+			c_{ij} = \sum_{k=1}^{n} a_{ik} \cdot b_{kj} + c_{ij}
+			\]
+			
+			Hier wird jedes Element $c_{ij}$ der Matrix $C$ als die Summe der Produkte der entsprechenden Elemente von Zeile $i$ der Matrix $A$ mit Spalte $j$ der Matrix $B$ definiert, zu der dann das entsprechende Element $c_{ij}$ in $C$ addiert wird.
+			
+			Dies können wir mit drei \texttt{for}-Schleifen realisieren. 
+			Dabei speichern wir aber die Matrizen als gepitchte 1D-Arrays und bestimmen jedes mal die analogen Indizes.
 		
+	\end{task}
+	
+	
+	\begin{task}{Algorithmus der Cannon-Iteration}\label{task:1}
 		Zuerst werden zwei Matrizen A und B gefüllt, testweise mit der Zahlenreihe von 1 bis $n \times n$.
 		In dieser Übung werden wir doppelte Schleifen zur Füllung, Lesen oder Berechnen mit einer Matrix häufig sehen.
 		Also hier bereits eine doppelte Initialisierungsschleife. Gleich danach auch eine einfache Testfunktion um Matrizen auf die Konsole ausgeben zu können.
@@ -102,19 +113,19 @@ subtask=ruled %or plain
 	\end{task}
 	
 	\begin{task}{Zeitmessung}
-		!!!!!
-	
+		Wir fügen an geeigneten Stellen im Code eine Operation ein, die die aktuelle System-Wallclock-Time ausließt und abspeichert.
+		Für die parallelen Anteile sollte dies direkt nach einer synchronisierenden Operation erfolgen.
+		Die Differenz der beiden Ausdrücke liefert die vergangene Zeit, diese speichern wir in einer Datei ab.
 		
 	\end{task}
 	
 	\begin{task}{Ausführung auf dem Lichtenberg-Hochleistungsrechner} 
 		Zur Ausführung auf dem Cluster wird ein Job Script gebraucht. 
-		Die beiden Größe der Matrix werden als Kommandozeilenparameter übergeben.
-		Das batch Dokument vecmat.sh kann per SLURM in die Processqueue übergeben werden.
-		
-		!!!!!
-		
-		Dieses nimmt einige Einstellungen vor, lädt die notwendigen Module, baut das Programm unter Nutzung der Maven Bibliothek und führt es dann in unterschiedlichen Parameterkonfigurationen aus.
+		Zunächst wird das Programm mit \texttt{build.sh} erstellt.
+		Dieses Script nimmt einige Einstellungen vor, lädt die notwendigen Module, baut das Programm unter Nutzung der Maven Bibliothek.
+	
+		Das batch Dokument \texttt{run.sh} kann per SLURM in die Processqueue übergeben werden und führt es dann in unterschiedlichen Parameterkonfigurationen aus.
+		Die beiden Größen der Matrix werden hierbei als Kommandozeilenparameter übergeben.
 	\end{task}
 
 	
@@ -130,6 +141,62 @@ subtask=ruled %or plain
 		Nun wollen wir den Speed-up in Abhängigkeit der Prozessoren $p \in (1, 64)$ berechnen.
 		
 		versch Verteilung der Prozesse auf die verfügbaren Knoten, Proz und Kerne
+		
+		\begin{figure}[H]
+			\begin{tikzpicture}
+				\begin{axis}[
+					width=\linewidth,
+					height=10cm,
+					xlabel={$n$},
+					ylabel={Zeit (in s)},
+					legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1},
+					ymode=log, % logarithmische Skala für die y-Achse
+					xtick=data,
+					xticklabels={
+						250,500,750,1000,1250,1500,1750,2000,2250,2500
+					},
+					ymajorgrids=true,
+					enlargelimits=0.15,
+					]
+					
+					% Daten für total_time
+					\addplot table [x=n, y=total_time, col sep=space] {
+						n p d total_time iteration_time total_time_serial
+						250 1 250 75.174053 70.522816 42.850940
+						500 2 250 245.688419 241.032588 233.302618 
+						750 3 250 405.646907 394.764730 858.676219 
+						1000 4 250 494.231617 469.955544 1848.466915 
+						1250 5 250 542.761112 512.193297 3953.194378 
+						1500 6 250 594.218071 550.962515 6337.510202 
+						1750 7 250 795.978417 748.914136 10582.444563 
+						2000 8 250 1119.335352 1041.499844 15347.158819 
+						2250 9 250 1351.718528 1250.672542 23303.131579 
+						2500 10 250 1551.732666 1454.309952 29745.586409 
+					};
+					
+					% Daten für total_time_serial
+					\addplot table [x=n, y=total_time_serial, col sep=space] {
+						n p d total_time iteration_time total_time_serial
+						250 1 250 75.174053 70.522816 42.850940
+						500 2 250 245.688419 241.032588 233.302618 
+						750 3 250 405.646907 394.764730 858.676219 
+						1000 4 250 494.231617 469.955544 1848.466915 
+						1250 5 250 542.761112 512.193297 3953.194378 
+						1500 6 250 594.218071 550.962515 6337.510202 
+						1750 7 250 795.978417 748.914136 10582.444563 
+						2000 8 250 1119.335352 1041.499844 15347.158819 
+						2250 9 250 1351.718528 1250.672542 23303.131579 
+						2500 10 250 1551.732666 1454.309952 29745.586409 
+					};
+					
+					\legend{total\_time\_mpi, total\_time\_serial}
+				\end{axis}
+			\end{tikzpicture}
+			\caption{Ausführungszeiten bei verschiedener Matrixgröße $n \times n$ bei fester Blockgröße $d \times d = 250 \times 250$.}
+		\end{figure}
+		
+		
+		
 	\end{task}
 
 
