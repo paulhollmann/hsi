@@ -36,12 +36,12 @@ export PATH=$MPJ_HOME/bin:$PATH
 #done
 
 
-filename="${logfile}perf3_n_32768.txt"
-srun mpjrun.sh -np "$((1*1))" out/matmat.jar "$((32768 / 1))"  "$filename"
-srun mpjrun.sh -np "$((2*2))" out/matmat.jar "$((32768 / 2))"  "$filename"
-srun mpjrun.sh -np "$((4*4))" out/matmat.jar "$((32768 / 4))"  "$filename"
-srun mpjrun.sh -np "$((8*8))" out/matmat.jar "$((32768 / 8))"  "$filename"
-srun mpjrun.sh -np "$((16*16))" out/matmat.jar "$((32768 / 16))" "$filename"
-srun mpjrun.sh -np "$((32*32))" out/matmat.jar "$((32768 / 32))" "$filename"
-srun mpjrun.sh -np "$((64*64))" out/matmat.jar "$((32768 / 64))" "$filename"
+filename="${logfile}perf3_n_512.txt"
+srun mpjrun.sh -np "$((1*1))" out/matmat.jar "$((512 / 1))"  "$filename"
+srun mpjrun.sh -np "$((2*2))" out/matmat.jar "$((512 / 2))"  "$filename"
+srun mpjrun.sh -np "$((4*4))" out/matmat.jar "$((512 / 4))"  "$filename"
+srun mpjrun.sh -np "$((8*8))" out/matmat.jar "$((512 / 8))"  "$filename"
+srun mpjrun.sh -np "$((16*16))" out/matmat.jar "$((512 / 16))" "$filename"
+srun mpjrun.sh -np "$((32*32))" out/matmat.jar "$((512 / 32))" "$filename"
+srun mpjrun.sh -np "$((64*64))" out/matmat.jar "$((512 / 64))" "$filename"
 
