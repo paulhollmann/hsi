@@ -140,13 +140,17 @@ subtask=ruled %or plain
 		Vorgegeben sind $n$ aus $(n = 250 * p * i | i=1...8)$.
 		Wir betrachten dazu \autoref{fig:1}, hier sind für festes $i=1$ die Zeiten und Speedup für verschiedene $p$ angegeben.
 		
+		
+		Weiterhin sind in \autoref{fig:2} für eine feste Matrixgröße $n \times n = 512 \times 512$ bei variabler Anzahl an Prozessen/Blöcken die Ausführungszeiten für die serielle und die parallele Implementation gegeben.
+		
+		
 		\begin{figure}
 			\begin{tikzpicture}
 				\begin{axis}[
 					width=\linewidth,
 					height=10cm,
 					xlabel={$n$},
-					ylabel={Zeit (in s)},
+					ylabel={Zeit (in ms)},
 					legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1},
 					%ymode=log, % logarithmische Skala für die y-Achse
 					xtick=data,
@@ -244,11 +248,103 @@ subtask=ruled %or plain
 			\label{fig:1}
 		\end{figure}
 		
-		
+			\begin{figure}
+			\begin{tikzpicture}
+				\begin{axis}[
+					width=\linewidth,
+					height=10cm,
+					xlabel={$p$},
+					ylabel={Zeit (in ms)},
+					legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1},
+					%ymode=log, % logarithmische Skala für die y-Achse
+					%xtick=data,
+					%xticklabels={
+					%	250,500,750,1000,1250,1500,1750,2000,2250,2500
+					%},
+					ymajorgrids=true,
+					enlargelimits=0.15,
+					]
+					
+					% Daten für total_time
+					\addplot table [x=p, y=total_time, col sep=space] {
+						n p d total_time iteration_time total_time_serial speedup
+						512 1 512 492.832580 486.736796 276.113974
+						512 2 256 231.952349 226.557002 273.668552
+						512 4 128 100.227280 88.977390 268.587681
+						512 8 64 155.395921 109.337505 298.448765 
+					};
+					
+					% Daten für total_time_serial
+					\addplot table [x=p, y=total_time_serial, col sep=space] {	
+						n p d total_time iteration_time total_time_serial speedup
+						512 1 512 492.832580 486.736796 276.113974
+					};
+					
+					\addplot[color=red] coordinates {(1,276.113974) (8,276.113974)};
+					
+					\legend{total\_time\_mpi, total\_time\_serial}
+				\end{axis}
+			\end{tikzpicture}
+			\vspace{1cm}
+
+			\caption{Ausführungszeiten bei fester Matrixgröße $n \times n = 512 \times 512$ bei variabler Anzahl an Prozessen/Blöcken $p\times p$.}
+			\label{fig:2}
+		\end{figure}
 		
 	\end{task}
 
+\appendix
+\section{Appendix}
 
+\begin{table}[htbp]
+	\centering
+	\caption{$i=1$}
+	\begin{tabular}{ccccccc}
+		
+		$n$ & $p$ & $d$ & \texttt{total\_time} & \texttt{iteration\_time} & \texttt{total\_time\_serial} & \texttt{speedup} \\ 
+		250 & 1   & 250 & 78.124379            & 73.671789               & 42.745262                  & 0.547           \\
+		500 & 2   & 250 & 170.774677           & 165.244979              & 234.285244                 & 1.372           \\
+		750 & 3   & 250 & 397.874633           & 386.858913              & 850.495494                 & 2.138           \\
+		1000 & 4  & 250 & 454.755784           & 435.767971              & 1864.183013                & 4.099           \\
+		1250 & 5  & 250 & 577.207197           & 550.504542              & 3918.535531                & 6.789           \\
+		1500 & 6  & 250 & 693.120829           & 648.291919              & 6452.740433                & 9.308           \\
+		1750 & 7  & 250 & 792.770004           & 740.677666              & 10505.367847               & 13.242          \\
+		2000 & 8  & 250 & 1103.661548          & 1024.117664             & 15372.658727               & 13.930          \\ 
+	\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+	\centering
+	\caption{$i=2$}
+	\begin{tabular}{ccccccc}
+		
+		$n$ & $p$ & $d$ & \texttt{total\_time} & \texttt{iteration\_time} & \texttt{total\_time\_serial} & \texttt{speedup} \\ 
+		500 & 1   & 500 & 418.047218           & 412.365480              & 232.304090                 & 0.556            \\
+		1000 & 2  & 500 & 858.025776           & 839.008822              & 1842.922648                & 2.146            \\
+		1500 & 3  & 500 & 1265.123430          & 1225.391751             & 6340.994963                & 5.008            \\
+		2000 & 4  & 500 & 1683.919865          & 1628.312668             & 15338.653827               & 9.110            \\
+		2500 & 5  & 500 & 2142.396334          & 2034.742117             & 29925.548407               & 13.960           \\
+		3000 & 6  & 500 & 2584.630721          & 2459.616172             & 56333.687995               & 21.801           \\
+		3500 & 7  & 500 & 2970.906467          & 2847.449974             & 106263.897843              & 35.792           \\
+		4000 & 8  & 500 & 3622.656907          & 3390.409005             & 153361.794324              & 42.329           \\
+	\end{tabular}
+\end{table}
+
+...
+
+
+\begin{table}[htbp]
+	\centering
+	\caption{$n=512$}
+	
+	\begin{tabular}{ccccccc}
+		$n$ & $p$ & $d$ & \texttt{total\_time} & \texttt{iteration\_time} & \texttt{total\_time\_serial} & \texttt{speedup} \\
+		512 & 1   & 512 & 492.832580           & 486.736796              & 276.113974                 & 0.560            \\
+		512 & 2   & 256 & 231.952349           & 226.557002              & 273.668552                 & 1.180            \\
+		512 & 4   & 128 & 100.227280           & 88.977390               & 268.587681                 & 2.679            \\
+		512 & 8   & 64  & 155.395921           & 109.337505              & 298.448765                 & 1.922            \\
+	\end{tabular}
+\end{table}
 	
 	
 \end{document}
