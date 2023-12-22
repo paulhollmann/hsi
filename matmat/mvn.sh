@@ -1,5 +1,4 @@
 #!/bin/bash
-
 M2_HOME=~/mvn
 MAVEN_URL=https://mirrors.estointernet.in/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
 MAVEN_ARCHIVE=apache-maven-3.6.3-bin
@@ -24,4 +23,4 @@ if [ ! -d "$M2_HOME" ]; then
 fi
 
 # Execute mvn with the given parameters
-"$M2_HOME"/bin/mvn "$@"
+"$M2_HOME"/bin/mvn "$@" -q

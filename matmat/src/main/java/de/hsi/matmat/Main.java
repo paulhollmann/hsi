@@ -26,11 +26,11 @@ public class Main {
         float[][] B;
         float[][] C;
 
-        final float[] global_a = new float[p * p * d * d];
-        final float[] global_b = new float[p * p * d * d];
-        final float[] global_c = new float[p * p * d * d];
+        final float[] global_a = getMat(p, d); //new float[p * p * d * d];
+        final float[] global_b = getMat(p, d); //new float[p * p * d * d];
+        final float[] global_c = getMat(p, d); //new float[p * p * d * d];
 
-        if (rank == MPI.HOST) {
+        if (false) {
             A = new float[p * p][d * d]; // [[1,1,1,1], [2,2,2,2], [3,3,3,3], [4,4,4,4]] für p = 2 und d = 2
             B = new float[p * p][d * d];
             C = new float[p * p][d * d];
@@ -50,15 +50,17 @@ public class Main {
             printMatrix(B, n, p);
             System.out.println("C :");
             printMatrix(C, n, p);
+        }
 
-            var D = getCannonIteration(A, B, C);
 
-            System.out.println("C = AB * C:");
-            printMatrix(D, n, p);
+        if (false) {
+            //var D = getCannonIteration(A, B, C);
 
-            MPI.COMM_WORLD.Barrier();
+            //System.out.println("C = AB * C:");
+            //printMatrix(D, n, p);
 
-            System.out.println("Usage of MPI, I am Host, Size is  " + MPI.COMM_WORLD.Size() + " ------------------");
+
+            //System.out.println("Usage of MPI, I am Host, Size is  " + MPI.COMM_WORLD.Size() + " ------------------");
 
             // Initialisierung mittels steigernder zyklischer Vertauschung
             for (int i = 0; i < p; i++) { //block_rows (for A)
@@ -89,12 +91,16 @@ public class Main {
             }
 
         } else {
-            MPI.COMM_WORLD.Barrier();
-            System.out.println("Hello World! I am number <" + (rank + 1) + "/" + size + ">\n");
+            //MPI.COMM_WORLD.Barrier();
+            //System.out.println("Hello World! I am number <" + (rank + 1) + "/" + size + ">\n");
         }
+
+
         MPI.COMM_WORLD.Barrier();
         if (rank == MPI.HOST) {
+            System.out.println("global_a=");
             printMatrix(global_a, d, p);
+            System.out.println(".");
         }
         MPI.COMM_WORLD.Barrier();
 
@@ -106,21 +112,56 @@ public class Main {
         final int rank_y = rank / p;
         final int rank_x = rank - rank_y * p;
 
-        int iteration = 1;
-
-        MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a[1], 0, d * d, MPI.FLOAT, MPI.HOST);
-        MPI.COMM_WORLD.Scatter(global_b, 0, d * d, MPI.FLOAT, local_b[1], 0, d * d, MPI.FLOAT, MPI.HOST);
+        final int initial_local_out = 0;
+        MPI.COMM_WORLD.Scatter(global_a, 0, d * d, MPI.FLOAT, local_a[initial_local_out], 0, d * d, MPI.FLOAT, MPI.HOST);
+        MPI.COMM_WORLD.Scatter(global_b, 0, d * d, MPI.FLOAT, local_b[initial_local_out], 0, d * d, MPI.FLOAT, MPI.HOST);
         MPI.COMM_WORLD.Scatter(global_c, 0, d * d, MPI.FLOAT, local_c, 0, d * d, MPI.FLOAT, MPI.HOST);
 
+
+        int iteration = 0;
         // STEP INIT
-        //int send_to_rank_a = rank_x - rank_y >= 0 ? rank - rank_y : rank - rank_y + p;
-        //int send_to_rank_b = rank_y - rank_x >= 0 ? rank - rank_x * p : rank - rank_x * p + p * p;
-        //MPI.COMM_WORLD.Send(local_a, 0, d * d, MPI.FLOAT, send_to_rank_a, rank);
-        //MPI.COMM_WORLD.Send(local_b, 0, d * d, MPI.FLOAT, send_to_rank_b, rank);
-        //MPI.COMM_WORLD.Recv(local_a, )
+        {
+            final int local_out = 0;
+            final int local_in = 1;
 
+            final int tag_a = 1;
+            final int tag_b = 2;
 
-        for (; iteration < p; iteration++) {
+            int send_to_rank_a = rank + (rank_x - rank_y >= 0 ? 0 : p) - rank_y;
+            int send_to_rank_b = rank + (rank_y - rank_x >= 0 ? 0 : p * p) - rank_x * p;
+            int receive_from_rank_a = rank - (rank_x + rank_y < p ? 0 : p) + rank_y;
+            int receive_from_rank_b = rank - (rank_y + rank_x < p ? 0 : p * p) + rank_x * p;
+
+            //System.out.println("Rank " + rank + " sends A" + Arrays.toString(local_a[local_out]) + " to rank " + send_to_rank_a);
+            //System.out.println("Rank " + rank + " sends B" + Arrays.toString(local_b[local_out]) + " to rank " + send_to_rank_b);
+
+            Request req_a = MPI.COMM_WORLD.Isend(local_a[local_out], 0, d * d, MPI.FLOAT, send_to_rank_a, tag_a);
+            Request req_b = MPI.COMM_WORLD.Isend(local_b[local_out], 0, d * d, MPI.FLOAT, send_to_rank_b, tag_b);
+            MPI.COMM_WORLD.Recv(local_a[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_a, tag_a);
+            MPI.COMM_WORLD.Recv(local_b[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_b, tag_b);
+
+            //System.out.println("Rank " + rank + " received A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
+            //System.out.println("Rank " + rank + " received B" + Arrays.toString(local_b[local_in]) + " from rank " + receive_from_rank_b);
+
+            req_a.Wait();
+            req_b.Wait();
+
+            // debug
+            if (false) {
+                MPI.COMM_WORLD.Barrier();
+                MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
+                if (rank == MPI.HOST) {
+                    System.out.println("after init: global_c=");
+                    printMatrix(global_c, d, p);
+                    System.out.println(" ");
+                }
+                MPI.COMM_WORLD.Barrier();
+            }
+        }
+
+        iteration++;
+
+        for (; iteration <= p; iteration++) {
             final int local_out = iteration % 2 == 1 ? 1 : 0;
             final int local_in = iteration % 2 == 0 ? 1 : 0;
 
@@ -133,50 +174,54 @@ public class Main {
             final int receive_from_rank_a = rank - (rank_x + 1 < p ? 0 : p) + 1;
             final int receive_from_rank_b = rank - (rank_y + 1 < p ? 0 : p * p) + p;
 
-            Request req_a = MPI.COMM_WORLD.Isend(local_a[local_out], 0, d * d, MPI.FLOAT, send_to_rank_a, tag_a);
-            //System.out.println("Rank " + rank + " sends A" + Arrays.toString(local_a[local_out]) + " to rank " + send_to_rank_a);
-
-            Request req_b = MPI.COMM_WORLD.Isend(local_b[local_out], 0, d * d, MPI.FLOAT, send_to_rank_b, tag_b);
-            //System.out.println("Rank " + rank + " sends B" + Arrays.toString(local_b[local_out]) + " to rank " + send_to_rank_b);
-
-
-            MPI.COMM_WORLD.Recv(local_a[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_a, tag_a);
-            //System.out.println("Rank " + rank + " receives A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
-
-            MPI.COMM_WORLD.Recv(local_b[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_b, tag_b);
-            //System.out.println("Rank " + rank + " receives B" + Arrays.toString(local_b[local_in]) + " from rank " + receive_from_rank_b);
-
-
             for (int y = 0; y < d; y++) {
                 for (int x = 0; x < d; x++) {
                     float res = 0.f;
                     for (int xy = 0; xy < d; xy++) {
-                        res += local_a[local_in][y * d + xy] * local_b[local_in][xy * d + x];
+                        res += local_a[local_out][y * d + xy] * local_b[local_out][xy * d + x];
                     }
                     local_c[y * d + x] += res;
                 }
             }
+            if (iteration == p) {
+                break; // last iteration
+            }
+            //System.out.println("Rank " + rank + " sends A" + Arrays.toString(local_a[local_out]) + " to rank " + send_to_rank_a);
+            //System.out.println("Rank " + rank + " sends B" + Arrays.toString(local_b[local_out]) + " to rank " + send_to_rank_b);
+
+            Request req_a = MPI.COMM_WORLD.Isend(local_a[local_out], 0, d * d, MPI.FLOAT, send_to_rank_a, tag_a);
+            Request req_b = MPI.COMM_WORLD.Isend(local_b[local_out], 0, d * d, MPI.FLOAT, send_to_rank_b, tag_b);
+            MPI.COMM_WORLD.Recv(local_a[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_a, tag_a);
+            MPI.COMM_WORLD.Recv(local_b[local_in], 0, d * d, MPI.FLOAT, receive_from_rank_b, tag_b);
+
+            //System.out.println("Rank " + rank + " received A" + Arrays.toString(local_a[local_in]) + " from rank " + receive_from_rank_a);
+            //System.out.println("Rank " + rank + " received B" + Arrays.toString(local_b[local_in]) + " from rank " + receive_from_rank_b);
 
 
             req_a.Wait();
             req_b.Wait();
 
             // debug
-            MPI.COMM_WORLD.Barrier();
-            MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
-            if (rank == MPI.HOST) {
-                printMatrix(global_c, d, p);
-                System.out.println("Iteration ----------------------------------------------");
+            if (true) {
+                MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
+                if (rank == MPI.HOST) {
+                    System.out.println("after iteration " + iteration + ": global_c=");
+                    printMatrix(global_c, d, p);
+                    System.out.println(" ");
+                }
+                MPI.COMM_WORLD.Barrier();
             }
-            MPI.COMM_WORLD.Barrier();
         }
 
 
-        MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
-
-
-        if (rank == MPI.HOST) {
-            printMatrix(global_c, d, p);
+        if (true) {
+            MPI.COMM_WORLD.Gather(local_c, 0, d * d, MPI.FLOAT, global_c, 0, d * d, MPI.FLOAT, MPI.HOST);
+            if (rank == MPI.HOST) {
+                System.out.println("after iteration " + iteration + ": global_c=");
+                printMatrix(global_c, d, p);
+                System.out.println(" ");
+            }
+            MPI.COMM_WORLD.Barrier();
         }
 
         //System.out.println("C = AB + C:");
@@ -184,6 +229,23 @@ public class Main {
         MPI.Finalize();
 
     }
+
+    public static float[] getMat(int p, int d) {
+        float[] mat = new float[p * p * d * d];
+        for (int j = 0; j < p; j++) {
+            for (int y = 0; y < d; y++) {
+                for (int i = 0; i < p; i++) {
+                    int offset = j * p * d * d + i * d * d;
+                    for (int x = 0; x < d; x++) {
+                        mat[offset + y * d + x] = j * p + i;
+                    }
+                }
+            }
+        }
+
+        return mat;
+    }
+
 
     public static float[] getMatMul(float[] matA, float[] matB, float[] matC) {
         int n = (int) Math.sqrt(matA.length);
@@ -282,7 +344,7 @@ public class Main {
                 var y_block = y / d;
                 var x_local = x - x_block * d;
                 var y_local = y - y_block * d;
-                System.out.format("%02f  ", mat[y_block * p + x_block][y_local * d + x_local]);
+                System.out.format("%2.0f ", mat[y_block * p + x_block][y_local * d + x_local]);
             }
             System.out.println();
         }
@@ -293,15 +355,15 @@ public class Main {
             for (int y = 0; y < d; y++) {
                 for (int i = 0; i < p; i++) {
                     System.out.print("| ");
-                    int offset = j * p * d * d + i * d;
+                    int offset = j * p * d * d + i * d * d;
                     for (int x = 0; x < d; x++) {
-                        System.out.print(mat[offset + y * d + x] + " ");
+                        System.out.format("%2.1f ", mat[offset + y * d + x]);
                     }
                 }
                 System.out.print(" \n");
             }
             for (int t = 0; t < d * p; t++) {
-                System.out.print(" ---- ");
+                System.out.print(" --- ");
             }
             System.out.print(" \n");
         }

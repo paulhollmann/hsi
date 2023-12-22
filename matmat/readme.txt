@@ -18,6 +18,6 @@ export MPJ_HOME=/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/lib/mpj-v0_44
 export MPJ_HOME=/work/home/kurse/kurs00069/nb62hoty/hsi/matmat/lib/mpj-v0_44
 export PATH=$MPJ_HOME/bin:$PATH
 
-mpjrun.sh -np 4  out/matmat.jar
+mpjrun.sh -np 4  out/matmat.jar 1
 
 
