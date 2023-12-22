@@ -11,7 +11,7 @@
 #SBATCH --mem-per-cpu=3600
 #SBATCH --time=00:15:00
 #SBATCH -n 1
-#SBATCH -c 32
+#SBATCH -c 72
 
 
 cd /work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/ || exit
@@ -21,8 +21,18 @@ cd /work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/ || exit
 module load intel
 module load java
 
+logfile="/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/logs/perf.txt"
 
 export MPJ_HOME=/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/lib/mpj-v0_44
 export PATH=$MPJ_HOME/bin:$PATH
 
-srun mpjrun.sh -np 4  out/matmat.jar
+for i in {1..8}; do
+    for p in {1..64}; do
+        d=$((250 * i))
+
+        srun mpjrun.sh -np "$p"  out/matmat.jar "$d" "$logfile"
+
+    done
+done
+
+

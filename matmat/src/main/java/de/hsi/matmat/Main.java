@@ -172,8 +172,10 @@ public class Main {
             double total_time = (double) (time_final - time_before_init) / 1e6;
             double total_time_serial = (double) (time_after_serial - time_before_serial) / 1e6;
             System.out.printf("completed in %f ms (total parallel), %f ms (iteration only), %f ms (serial) ", total_time, iteration_time, total_time_serial);
+            
             boolean good = verify(global_c_serial_result, convertMat(global_c, p, d, true), 1e-45f);
             System.out.print(good ? "ok " : "NICHT ok");
+
             if (append_to_file && good) {
                 FileHelper.appendToFile(file_name, String.format("%d %d %d %f %f %f \n", n, p, d, total_time, iteration_time, total_time_serial));
             }
