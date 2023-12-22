@@ -70,121 +70,17 @@ subtask=ruled %or plain
 	\begin{task}{Paralleler Algorithmus mit MPJ}
 		
 		!!!!!
-		Noch bevor Bearbeitung der nächsten Teilaufgabe haben wir uns die Dokumentationen von OpenCL und JOCL herausgesucht und anhand der Beispiele aus dem moodle-Kurs und von JOCL ein Verständnis zur Einbindung von OpenCL-Code erlangt.
-		Dann haben wir, noch auf den eigenen Rechnern, einen Kernel in einer Extradatei ausgelagert, da es eine schönere Formatierung ermöglicht.
-		Der ganze Code im Kernel ist ein C/C++ Dialekt, was hier noch wenige Auswirkungen hat, aber nicht vergessen werden sollte.
-		Als Vorlage zum Kernel dient das Programm aus Aufgabe \ref{task:1}. Wichtige Ergänzungen im Funktionskopf sind hierbei zuerst einmal die Spezifikation als kernel, die Änderung von Arrays zu Pointern als auch die Angabe des Adressraums der Parameter.
-		Sinnvoll in diesem ersten Programm ist der global-Adressbereich, da hier die Variablen von host und device verwendet werden können.
-		Die Datentypen sind in diesem Fall noch die gleichen, es gibt aber zum Beispiel nicht einfach einen double Typ. Dieser scheint standardmäßig nicht auf allen Geräten verfügbar zu sein.
-		Zum Aufsplitten der Berechnung von einzelnen Spalten wird die ID der jeweiligen Threads per get\_global\_id erhalten.
-		Diese Zahl wird als Zeilennummer der Matrix und des Ergebnisses verwendet.
-		
-		Nach diesem Schritt in OpenCL-Code wird die Einbindung in den Java-Code benötigt.
-		Es muss eine platform, properties und damit ein device erstellt werden. Das JOCL Device-Object haben wir für ein paar Testdaten mal untersucht und besonders die maximale Anzahl an work\_groups ist für spätere Ziele noch relevant.
-		Ein Context wird für das Programm noch benötigt bevor der Kernel per clCreateProgramWithSource in den JOCL Code eingefügt werden kann.
-		Der C++ Code muss gebuilded werden und kann im Anschluss, durch clCreateKernel, als Kernel erstellt werden.
-		Eine Command Queue wird erschaffen, um den Kernel später für eine asynchrone Ausführung auf das Device zu schicken.
-		Etwas mehr Aufmerksamkeit mussten wir der memory object Erstellung schenken. Buffer wurden für alle Parameter und die Rückgabe erstellt und die Größe der Dateitypen sollte dazu beachtet werden.
-		Der Kernel wird mit den Buffer-Objekten und möglichen Konstanten verbunden, die Systemzeit wird einmal gemessen und dann geht es endlich zur Ausführung des Kernels:
-		$clEnqueueNDRangeKernel(commandQueue, kernel, 1, null,
-		global\_work\_size, local\_work\_size,
-		0, null, null);$
-		Im Ausführungsbefehl können, wichtig für spätere Ziele, die work\_groups angepasst werden. Zuerst verwenden wir hier local\_work\_size=NULL, da sich OpenCL dann selbst eine geeignete Größe bestimmt.
-		%Asynchrones Ausführen ? oder nicht und funktioniert daher System.nanoTime()
-		Nach der Ausführung wird der Buffer mit dem Ergebnis gelesen und nochmal die Zeit gemessen.
-		Zu guter Letzt, immer wichtig bei der Arbeit direkt mit Speicher, müssen die Objekte freigegeben werden.
-		Mit den richtigen Timern können wir schon gleich die Zeiten der Berechnung sequentiell und parallel vergleichen.
-		
-		Vergleicht man die Ergebnisse zwischen Berechnungen auf den verschiedenen Geräten so stellt man minimale Unterschiede fest. 
-		Hier kann es sich verschiedene Gleitkomma Multiplizier- und Addiergenauigkeiten oder -optmierungen auf den verschiedenen Geräten handeln. 
+	
 	\end{task}
 	
 	\begin{task}{Zeitmessung}
 		!!!!!
-		In dieser Teilaufgabe ist es nun verlangt für einige Problemgrößen die Ausführungszeit auf dem Cluster zu messen.
-		
-		
-		\begin{table}[H]
-			\centering
-			\begin{tabular}{|c|c|c|c|}
-				\hline
-				\textbf{Problemgröße} $m$ & \textbf{CPU Zeit} [ms] & \textbf{Kernelzeit} [ms] & \textbf{Komplette Devicezeit} [ms]  \\
-				\hline
-				1 & 0.003343 & 0.037888 & 0.765934 \\
-				10 & 0.007416 & 0.033792 & 0.783118 \\
-				1000 & 18.08856 & 0.164864 & 6.884962 \\
-				2000 & 16.543831 & 0.376832 & 18.906941 \\
-				4000 & 37.728688 & 0.945152 & 67.266515 \\
-				8000 & 123.748559 & 1.862656 & 248.687903 \\
-				15000 & 409.879089 & 2.832384 & 825.980899 \\
-				46340 & 3815.686135 & 35.605504 & 7729.755513 \\
-				\hline
-			\end{tabular}
-			
-			
-			\caption{Vergleich CPU vs. GPU Ausführungen.}
-			\label{tab:data}
-		\end{table}
-		\begin{figure}[H]
-			\begin{tikzpicture}
-				\begin{axis}[
-					width=\linewidth,
-					height=5cm,
-					xlabel={Problemgröße},
-					ylabel={Zeit [ms]},
-					legend style={at={(0.9,-0.2)}, anchor=north},
-					ymajorgrids=true,
-					xmode=log,
-					log basis x={10},
-					]
-					
-					\addplot[
-					color=blue,
-					mark=*,
-					]
-					coordinates {
-						(1, 0.003343)
-						(10, 0.007416)
-						(1000, 18.08856)
-						(2000, 16.543831)
-						(4000, 37.728688)
-						(8000, 123.748559)
-						(15000, 409.879089)
-					};
-					\addlegendentry{CPU Zeit}
-					
-					\addplot[
-					color=red,
-					mark=square,
-					]
-					coordinates {
-						(1, 0.037888)
-						(10, 0.033792)
-						(1000, 0.164864)
-						(2000, 0.376832)
-						(4000, 0.945152)
-						(8000, 1.862656)
-						(15000, 2.832384)
-					};
-					\addlegendentry{Kernelzeit}
-					
-				\end{axis}
-			\end{tikzpicture}
-			\caption{Daten aus \autoref{tab:data} als Plot.}
-		\end{figure}
-		
-		\autoref{tab:data} stellt für verschiedene Problemgrößen die Rechenzeiten unterteilt in CPU Zeit, Kernelzeit und komplette Devicezeit\footnote{Device Speicherallokation + Kopieren der Arrays hin und zurück sowie Aufruf und Ausführen des Kernels.} dar.
-		
-		Erkennbar ist, dass die Parallelisierung bis Problemgröße $m=10$, keine Beschleunigung der Multiplikation darstellt.
-		Die Erstellung der Threads ist bei $m=10$ noch zu aufwendig, dass es ein Vielfaches der Zeit des sequentiellen Codes braucht.
-		Bei höheren Problemgrößen gewinnt der Kernel alleine gegen die sequentielle Funktion, allerdings gibt es Overhead bei der Erstellung der Objekte und dem Kopieren der großen Arrays in den device-memory.
-		Für das Problem alleine, scheint sich die Parallelisierung noch nicht zu lohnen.
-		Kann aber mit den Daten auf dem Device weitergearbeitet fallen die Kopiervorgänge weitestgehend weg, und dann bietet die einen echten zeitlichen Vorteil.
+	
 		
 	\end{task}
 	
 	\begin{task}{Ausführung auf dem Lichtenberg-Hochleistungsrechner} 
-		Zur Ausführung auf dem Cluster wird ein Job Script gebraucht. Erneut verwenden wir hier Maven, zum Compilieren und Bauen einer JAR Datei.
+		Zur Ausführung auf dem Cluster wird ein Job Script gebraucht. 
 		Die beiden Größe der Matrix werden als Kommandozeilenparameter übergeben.
 		Das batch Dokument vecmat.sh kann per SLURM in die Processqueue übergeben werden.
 		
