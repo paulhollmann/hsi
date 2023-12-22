@@ -21,7 +21,7 @@ cd /work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/ || exit
 module load intel
 module load java
 
-logfile="/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/logs/perf.txt"
+logfile="/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/logs/"
 
 export MPJ_HOME=/work/home/kurse/kurs00069/ph84wuqa/hsi/matmat/lib/mpj-v0_44
 export PATH=$MPJ_HOME/bin:$PATH
@@ -30,7 +30,7 @@ for i in {1..8}; do
     for p in {1..64}; do
         d=$((250 * i))
 
-        srun mpjrun.sh -np "$p"  out/matmat.jar "$d" "$logfile"
+        srun mpjrun.sh -np "$p"  out/matmat.jar "$d" "$(logfile)_i_$(i)_perf.txt"
 
     done
 done
