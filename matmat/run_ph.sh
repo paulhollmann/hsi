@@ -9,7 +9,7 @@
 #SBATCH -o /home/kurse/kurs00069/ph84wuqa/hsi/matmat/logs/out.%j
 
 #SBATCH --mem-per-cpu=3600
-#SBATCH --time=00:15:00
+#SBATCH --time=00:32:00
 #SBATCH -n 1
 #SBATCH -c 72
 
@@ -29,9 +29,8 @@ export PATH=$MPJ_HOME/bin:$PATH
 for i in {1..8}; do
     for p in {1..64}; do
         d=$((250 * i))
-
-        srun mpjrun.sh -np "$p"  out/matmat.jar "$d" "$(logfile)_i_$(i)_perf.txt"
-
+        filename="${logfile}perf_i_${i}.txt"
+        srun mpjrun.sh -np "$p"  out/matmat.jar "$d" "$filename"
     done
 done
 
