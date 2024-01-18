@@ -1,0 +1,66 @@
+#
+#  FEM Funktionsdaten
+#  ==================
+#  
+#  
+#
+#
+# Anzahl der Materialbereiche
+  1
+# Kxx und Kyy in Bereich 1 
+  2.000E+02   2.000E+02
+#
+# ****** Definition der Randbereiche ******
+#
+# Anzahl verschiedener Randbereiche 
+  2
+# Nun kommen die Anzahlen der Kanten und die Art der Randbedingung
+# in den einzelnen Randbereichen
+#    1 ... Dirichlet     a       ( u(x)=a )
+#    2 ... Neumann       a       ( du(x)/dn=a )
+#    3 ... Robin         a   b   ( du(x)/dn=a*( b-u(x) )
+#
+# Anzahl der Kanten und Art der Randbedingung in Randbereich 1 (unten)
+  2  1
+# RB 2
+  6  3 
+# Jetzt die globalen Nummer der Kanten im Randbereich 1 und die zugehoerigen 
+# Randdaten
+#
+  1  0.0
+  2  0.0
+# Randbereich 2
+  3  10.0 2.0
+  4  10.0 2.0
+  5  10.0 2.0
+  6  10.0 2.0
+  7  10.0 2.0
+  8  10.0 2.0
+# ***** Rechte Seite *****
+#
+# Fonction F(x,y)
+# a0 + a1*X + a2*Y +  a3*X² + a4*Y² + a5*XY + a6*cos(X) + a7*cos(Y) + a8*sin(X) + a9*sin(Y) + a10*exp(X) + a11*exp(Y)
+# a0
+10
+# a1
+10
+# a2
+10
+# a3
+10
+# a4
+10
+# a5
+10
+# a6
+0
+# a7
+0
+# a8
+0
+# a9
+0
+# a10
+0
+# a11
+0

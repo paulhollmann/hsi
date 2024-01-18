@@ -1,0 +1,140 @@
+#
+#  Problembeschreibung (schluessel.dat)
+#  ===================
+#
+# Anzahl der Materialbereiche
+#
+  1
+#
+# Waermeleitzahlen Kxx und Kyy in Bereich 1
+#
+  2.000E+02   2.000E+02
+#
+# Haetten wir noch weitere Materialbereiche,
+# dann kaemen noch weitere Daten
+#
+# ****** Definition der Randbereiche ******
+#
+# Anzahl verschiedener Randbereiche
+#
+  2
+#
+# Nun kommen die Anzahlen der Kanten und die Art der Rand-
+# bedingung in den einzelnen Randbereichen
+#    1 ... Dirichlet     g       ( u(x)=g )
+#    2 ... Neumann       g       ( du(x)/dN=g )
+#    3 ... Robin         a   g   ( du(x)/dN=a*( g-u(x) )
+#
+# Anzahl der Kanten und Art der Randbedingung in Randbereich 1
+#
+  56 3
+#
+# Anzahl der Kanten und Art der Randbedingung in Randbereich 2
+#
+  16 2
+#
+# Jetzt die globalen Nummer der Kanten im Randbereich 1 und die
+# zugehoerigen Randdaten ( dort war Robin, also 2 Werte )
+#
+  1  5.00E+01 3.00E+02
+  2  5.00E+01 3.00E+02
+  3  5.00E+01 3.00E+02
+  4  5.00E+01 3.00E+02
+  5  5.00E+01 3.00E+02
+  6  5.00E+01 3.00E+02
+  7  5.00E+01 3.00E+02
+  8  5.00E+01 3.00E+02
+  9  5.00E+01 3.00E+02
+ 10  5.00E+01 3.00E+02
+ 11  5.00E+01 3.00E+02
+ 12  5.00E+01 3.00E+02
+ 13  5.00E+01 3.00E+02
+ 14  5.00E+01 3.00E+02
+ 15  5.00E+01 3.00E+02
+ 16  5.00E+01 3.00E+02
+ 17  5.00E+01 3.00E+02
+ 18  5.00E+01 3.00E+02
+ 19  5.00E+01 3.00E+02
+ 20  5.00E+01 3.00E+02
+ 21  5.00E+01 3.00E+02
+ 22  5.00E+01 3.00E+02
+ 23  5.00E+01 3.00E+02
+ 24  5.00E+01 3.00E+02
+ 25  5.00E+01 3.00E+02
+ 26  5.00E+01 3.00E+02
+ 27  5.00E+01 3.00E+02
+ 28  5.00E+01 3.00E+02
+ 29  5.00E+01 3.00E+02
+ 30  5.00E+01 3.00E+02
+ 31  5.00E+01 3.00E+02
+ 32  5.00E+01 3.00E+02
+ 33  5.00E+01 3.00E+02
+ 34  5.00E+01 3.00E+02
+ 35  5.00E+01 3.00E+02
+ 36  5.00E+01 3.00E+02
+ 37  5.00E+01 3.00E+02
+ 38  5.00E+01 3.00E+02
+ 39  5.00E+01 3.00E+02
+ 40  5.00E+01 3.00E+02
+ 41  5.00E+01 3.00E+02
+ 42  5.00E+01 3.00E+02
+ 43  5.00E+01 3.00E+02
+ 44  5.00E+01 3.00E+02
+ 45  5.00E+01 3.00E+02
+ 46  5.00E+01 3.00E+02
+ 47  5.00E+01 3.00E+02
+ 48  5.00E+01 3.00E+02
+ 49  5.00E+01 3.00E+02
+ 50  5.00E+01 3.00E+02
+ 51  5.00E+01 3.00E+02
+ 52  5.00E+01 3.00E+02
+ 53  5.00E+01 3.00E+02
+ 54  5.00E+01 3.00E+02
+ 55  5.00E+01 3.00E+02
+ 56  5.00E+01 3.00E+02
+#
+# nun Randbereich 2, dort haben wir Neumann, also nur ein Wert
+#
+ 57  2.00E+02
+ 58  2.00E+02
+ 59  2.00E+02
+ 60  2.00E+02
+ 61  2.00E+02
+ 62  2.00E+02
+ 63  2.00E+02
+ 64  2.00E+02
+ 65  2.00E+02
+ 66  2.00E+02
+ 67  2.00E+02
+ 68  2.00E+02
+ 69  2.00E+02
+ 70  2.00E+02
+ 71  2.00E+02
+ 72  2.00E+02
+#
+# Fonction F(x,y)
+# a0 + a1*X + a2*Y +  a3*X² + a4*Y² + a5*XY + a6*cos(X) + a7*cos(Y) + a8*sin(X) + a9*sin(Y) + a10*exp(X) + a11*exp(Y)
+# a0
+0
+# a1
+0
+# a2
+0
+# a3
+0
+# a4
+0
+# a5
+0
+# a6
+0
+# a7
+0
+# a8
+0
+# a9
+0
+# a10
+0
+# a11
+0

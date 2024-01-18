@@ -1,0 +1,111 @@
+#
+#  FEM Funktionsdaten
+#  ==================
+#
+# Anzahl der Materialbereiche
+  1
+# Kxx und Kyy in Bereich 1 
+  2.000E+02   2.000E+02
+# dito in Bereich 2 (falls vorhanden)
+#  4.0000000000E+01   5.0000000000E+01
+#
+# Haetten wir noch weitere Materialbereiche,
+# dann kaemen noch weitere Daten
+#
+# ****** Definition der Randbereiche ******
+#
+# Anzahl verschiedener Randbereiche 
+  2
+# Nun kommen die Anzahlen der Kanten und die Art der Randbedingung
+# in den einzelnen Randbereichen
+#    1 ... Dirichlet     a       ( u(x)=a )
+#    2 ... Neumann       a       ( du(x)/dn=a )
+#    3 ... Robin         a   b   ( du(x)/dn=a*( b-u(x) )
+#
+# Anzahl der Kanten und Art der Randbedingung in Randbereich 1
+  28 3 
+# Anzahl der Kanten und Art der Randbedingung in Randbereich 2
+  8  2
+# 
+# Jetzt die globalen Nummer der Kanten im Randbereich 1 und die zugehoerigen 
+# Randdaten ( dort war Robin, also 2 Werte )
+#
+  1  5.00E+01 3.00E+02  
+  2  5.00E+01 3.00E+02  
+  3  5.00E+01 3.00E+02  
+  4  5.00E+01 3.00E+02  
+  5  5.00E+01 3.00E+02  
+  6  5.00E+01 3.00E+02  
+  7  5.00E+01 3.00E+02  
+  8  5.00E+01 3.00E+02  
+  9  5.00E+01 3.00E+02  
+ 10  5.00E+01 3.00E+02  
+ 11  5.00E+01 3.00E+02  
+ 12  5.00E+01 3.00E+02  
+ 13  5.00E+01 3.00E+02  
+ 14  5.00E+01 3.00E+02  
+ 15  5.00E+01 3.00E+02  
+ 16  5.00E+01 3.00E+02  
+ 17  5.00E+01 3.00E+02  
+ 18  5.00E+01 3.00E+02  
+ 19  5.00E+01 3.00E+02  
+ 20  5.00E+01 3.00E+02  
+ 21  5.00E+01 3.00E+02  
+ 22  5.00E+01 3.00E+02  
+ 23  5.00E+01 3.00E+02  
+ 24  5.00E+01 3.00E+02  
+ 25  5.00E+01 3.00E+02  
+ 26  5.00E+01 3.00E+02  
+ 27  5.00E+01 3.00E+02  
+ 28  5.00E+01 3.00E+02  
+#
+# nun Randbereich 2, dort haben wir Neumann, also nur ein Wert
+#
+ 29  2.00E+02
+ 30  2.00E+02
+ 31  2.00E+02
+ 32  2.00E+02
+ 33  2.00E+02
+ 34  2.00E+02
+ 35  2.00E+02
+ 36  2.00E+02
+#
+#
+# ***** Approximation der rechten Seite *****
+#
+# Als naechstes die Koeffizienten der Approximation von F(x,y)
+# Es gibt zwei Moeglichkeiten F zu definieren, entweder eine globale Funktion,
+# dann 0 als Kennung und nur einen Koeffizientensatz angeben oder Kennung 1 und so
+# viele Koeffizientensaetze angeben wie Materialbereiche vorhanden sind
+#
+# Anzahl der Koeffizienten ist zur Zeit 6
+#
+# Wir approximieren:
+# F(x,y)=k1+k2*x+k3*y+k4*x^2+k5*y^2+k6*x*y
+#
+# Fonction F(x,y)
+# a0 + a1*X + a2*Y +  a3*X² + a4*Y² + a5*XY + a6*cos(X) + a7*cos(Y) + a8*sin(X) + a9*sin(Y) + a10*exp(X) + a11*exp(Y)
+# a0
+0
+# a1
+0
+# a2
+0
+# a3
+0
+# a4
+0
+# a5
+0
+# a6
+0
+# a7
+0
+# a8
+0
+# a9
+0
+# a10
+0
+# a11
+0

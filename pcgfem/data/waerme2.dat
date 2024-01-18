@@ -1,0 +1,103 @@
+#
+#  FEM Funktionsdaten
+#  ==================
+#
+# Anzahl der Materialbereiche
+  2
+# Kxx und Kyy in Bereich 1 
+  1.000E+00   1.000E+00
+# dito in Bereich 2 (falls vorhanden)
+  3.7100000000E+02   3.7100000000E+02
+#
+# Haetten wir noch weitere Materialbereiche,
+# dann kaemen noch weitere Daten
+#
+# ****** Definition der Randbereiche ******
+#
+# Anzahl verschiedener Randbereiche 
+  3
+# Nun kommen die Anzahlen der Kanten und die Art der Randbedingung
+# in den einzelnen Randbereichen
+#    1 ... Dirichlet     a       ( u(x)=a )
+#    2 ... Neumann       a       ( du(x)/dn=a )
+#    3 ... Robin         a   b   ( du(x)/dn=a*( b-u(x) )
+#
+# Anzahl der Kanten und Art der Randbedingung in Randbereich 1
+   6 1 
+# Anzahl der Kanten und Art der Randbedingung in Randbereich 2
+  24 2
+# Anzahl der Kanten und Art der Randbedingung in Randbereich 3
+   4 3
+# 
+# Jetzt die globalen Nummer der Kanten im Randbereich 1 und die zugehoerigen 
+# Randdaten 
+#
+  26 5.00E+02
+  27 5.00E+02 
+  28 5.00E+02 
+  29 5.00E+02
+  30 5.00E+02 
+  31 5.00E+02 
+# 
+# Jetzt die globalen Nummer der Kanten im Randbereich 2 und die zugehoerigen 
+# Randdaten 
+#
+   5 0.0E+00
+   6 0.0E+00
+   7 0.0E+00
+   8 0.0E+00
+   9 0.0E+00
+  10 0.0E+00
+  11 0.0E+00
+  12 0.0E+00
+  13 0.0E+00
+  14 0.0E+00
+  15 0.0E+00
+  16 0.0E+00
+  17 0.0E+00
+  18 0.0E+00
+  19 0.0E+00
+  20 0.0E+00
+  21 0.0E+00
+  22 0.0E+00
+  23 0.0E+00
+  24 0.0E+00
+  25 0.0E+00
+  32 0.0E+00
+  33 0.0E+00
+  34 0.0E+00
+# 
+# Jetzt die globalen Nummer der Kanten im Randbereich 3 und die zugehoerigen 
+# Randdaten ( dort war Robin, also 2 Werte )
+#
+  1  5.600E+00   3.000E+02
+  2  5.600E+00   3.000E+02 
+  3  5.600E+00   3.000E+02
+  4  5.600E+00   3.000E+02
+#
+# Fonction F(x,y)
+# a0 + a1*X + a2*Y +  a3*X² + a4*Y² + a5*XY + a6*cos(X) + a7*cos(Y) + a8*sin(X) + a9*sin(Y) + a10*exp(X) + a11*exp(Y)
+# a0
+0
+# a1
+0
+# a2
+0
+# a3
+0
+# a4
+0
+# a5
+0
+# a6
+0
+# a7
+0
+# a8
+0
+# a9
+0
+# a10
+0
+# a11
+0
