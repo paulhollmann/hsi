@@ -12,30 +12,49 @@ public class PCGSolver {
      */
     public static double[] solve(double[][] K, double[] f) {
 
-        double[] v0 = new double[f.length];
+        var v_k_prev = copy(f);
 
-        double[] r0 = new double[f.length];
-        for(int i = 0; i < f.length; i++)
-        {
-            double[] temp = getMatVecProd(K, f);
-            r0[i] = f[i] - temp[0];
-        }
+        var r_k_prev = getVectorVectorSub(f, getMatVecProd(K, f));
 
         var C_inv  = getInvJacobiPreconditioner(K);
-        var d0 = getVectorVectorProduct(C_inv,r0);
+        var d_k_prev = getVectorVectorProduct(C_inv,r_k_prev);
 
-        var gamma0 = getDotProd(d0, r0);
+        var gamma_k_prev = getDotProd(d_k_prev, r_k_prev);
 
-        // Vektor aus gammas erstellen?
-        var gamma_k = 0;
-        for(int k = 1; gamma_k < 0.0000001; k++)
+        double eps = 1E-7 * gamma_k_prev;
+
+        double gamma_k;
+        double[] d_k;
+        double[] v_k;
+        double[] r_k;
+
+        for(int k = 1; ; k++)
         {
+            var u = getMatVecProd(K,d_k_prev);
+            var alpha = gamma_k_prev/getDotProd(d_k_prev,u);
 
+            v_k = getVectorVectorAdd(v_k_prev, getScalarVectorMul(alpha,  d_k_prev));
+            r_k = getVectorVectorSub(r_k_prev, getScalarVectorMul(alpha,  u));
 
+            var p = getVectorVectorProduct(C_inv, r_k);
+
+            gamma_k = getDotProd(r_k, p);
+            if (gamma_k < eps) {
+                System.out.println("Took k=" + k +" iterations.");
+                break;
+            }
+
+            var beta = gamma_k/gamma_k_prev;
+            d_k = getVectorVectorAdd(p, getScalarVectorMul(beta, d_k_prev));
+
+            v_k_prev = v_k;
+            r_k_prev = r_k;
+            d_k_prev = d_k;
+            gamma_k_prev = gamma_k;
         }
 
 
-        return v0;
+        return v_k;
     }
 
 }
