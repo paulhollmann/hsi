@@ -61,10 +61,10 @@ class SolutionTask {
         try {
             double[] solPCGP = stiffnessMatrix.pcgSolveParallel(lastVector); // solution of the problem
             System.out.println("solPCGP: " + Arrays.toString(solPCGP));
-            if (MathOperations.vectorComparison(solPCG, solPCG))
-                System.out.println("solPCG == solPCG");
+            if (MathOperations.vectorComparison(solPCG, solPCGP))
+                System.out.println("solPCG == solPCGP");
             else
-                System.out.println("solPCG != solPCG");
+                System.out.println("solPCG != solPCGP");
         } catch (MPIException mpiEx) {
             System.out.println(mpiEx.getMessage());
         }
