@@ -1,80 +1,79 @@
 package FEJDMath.hsi;
 
-import static FEJDMath.hsi.MathOperations.*;
-import static FEJDMath.hsi.MathOperations.getScalarVectorMul;
-
 import mpi.MPI;
+import mpi.Request;
+
+import static FEJDMath.hsi.MathOperations.*;
 
 public class PCGSolverParallel {
 
-    public static double[][] get_K_local(double[][] K_global, int number){
+    public static double[][] get_K_local(double[][] K_global, int number) {
         assert K_global.length == 9;
         assert K_global[0].length == 9;
         var K_local = new double[6][6];
-        if(number == 0) {
+        if (number == 0) {
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 6; j++) {
-                    double couplingfactor =  i > 3 && j > 3 ? 0.5 : 1;
-                    K_local[i][j] =  couplingfactor * K_global[i][j];
+                    double couplingfactor = i > 3 && j > 3 ? 0.5 : 1;
+                    K_local[i][j] = couplingfactor * K_global[i][j];
                 }
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 6; j++) {
                     double couplingfactor = i + 3 < 6 && j + 3 < 6 ? 0.5 : 1;
-                    K_local[i][j] =  couplingfactor * K_global[i+3][j+3];
+                    K_local[i][j] = couplingfactor * K_global[i + 3][j + 3];
                 }
             }
         }
         return K_local;
     }
 
-    public static double[] get_f_local(double[] f_global, int number){
+    public static double[] get_f_local(double[] f_global, int number) {
         assert f_global.length == 9;
         var f_local = new double[6];
-        if(number == 0) {
+        if (number == 0) {
             for (int i = 0; i < 6; i++) {
-                double couplingfactor =  i > 3 ? 0.5 : 1;
-                f_local[i] =  couplingfactor * f_global[i];
+                double couplingfactor = i > 3 ? 0.5 : 1;
+                f_local[i] = couplingfactor * f_global[i];
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < 6; i++) {
                 double couplingfactor = i + 3 < 6 ? 0.5 : 1;
-                f_local[i] =  couplingfactor * f_global[i+3];
+                f_local[i] = couplingfactor * f_global[i + 3];
             }
         }
         return f_local;
     }
 
-    public static double[] get_absolute_vec(double[] local_additive_vec, int number){
-        double[] result = copy(local_additive_vec);
+    public static double[] get_absolute_vec(double[] local_additive_vec, int number) {
+        double[] result;
         double[] result_from_other = new double[6];
         result = copy(local_additive_vec);
-        //todo  get result from other process
-        if(number == 0) {
+        Request req = MPI.COMM_WORLD.Isend(result, 0, 6, MPI.DOUBLE, number + 1 % 2, 43454);
+        MPI.COMM_WORLD.Recv(result_from_other, 0, 6, MPI.DOUBLE, number + 1 % 2, 43454);
+        if (number == 0) {
             for (int i = 0; i < 3; i++) {
-                result[i+3] += result_from_other[i];
+                result[i + 3] += result_from_other[i];
             }
         } else {
             for (int i = 0; i < 3; i++) {
-                result[i] += result_from_other[i+3];
+
+                result[i] += result_from_other[i + 3];
             }
         }
+        req.Wait();
         return result;
     }
 
-    public static double get_absolute_scalar(double local_additive_scalar, int number){
-        double result = local_additive_scalar;
-        double result_from_other = 0;
-        //todo  get result from other process
-        if(number == 0) {
-            result += result_from_other;
-        } else {
-            result += result_from_other;
-        }
-        return result;
+    public static double get_absolute_scalar(double local_additive_scalar, int number) {
+        double[] result = new double[]{local_additive_scalar};
+        double[] result_from_other = new double[1];
+        Request req = MPI.COMM_WORLD.Isend(result, 0, 1, MPI.DOUBLE, number + 1 % 2, 43454);
+        MPI.COMM_WORLD.Recv(result_from_other, 0, 1, MPI.DOUBLE, number + 1 % 2, 43454);
+        result[0] += result_from_other[0];
+        req.Wait();
+        return result[0];
     }
 
     /**
@@ -109,9 +108,8 @@ public class PCGSolverParallel {
         double[] v_k;
         double[] r_k;
 
-        for(int k = 1; ; k++)
-        {
-            var u = getMatVecProd(K_local,d_k_prev_local);
+        for (int k = 1; ; k++) {
+            var u = getMatVecProd(K_local, d_k_prev_local);
             var du = 0.0;
 
             /*
