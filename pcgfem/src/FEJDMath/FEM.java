@@ -1,12 +1,17 @@
 package FEJDMath;
 
+import mpi.MPI;
+
 public class FEM {
 
     public static String[] args;
     private static int domain = 0;
 
     public static void main(String[] args) {
-        FEM.args = args;
+
+        String[] appArgs = MPI.Init(args);
+
+        FEM.args = appArgs;
 
         String fname = "data/h03/9Meshpoints_1Domain";
 
