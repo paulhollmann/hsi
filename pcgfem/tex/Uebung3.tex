@@ -38,7 +38,55 @@ subtask=ruled %or plain
 	\hrule
 	{\Large \textbf{ FEM und PCG }} \vspace{2mm}
 	\hrule
-	
 
+	In dieser Übung soll ein Gleichungslöser mit dem preconditioned Conjugate-Gradient-Approach umgesetzt werden.
+
+	\begin{task}{Sequentieller PCG-Solver}
+		Wir haben direkt in der Code-Vorlage angefangen zu programmieren. Die Vorlage hat das Einlesen unterschiedlicher FEM-Netze erlaubt. Das erste Beispiel entspricht direkt der Übung.
+		Den sequentielle Solver haben wir direkt nach dem Pseudo-Code Algorithmus programmiert. Zur Hilfe wurden in $\mathtt{MathOperations.java}$ einige Hilfsfunktionen geschrieben. Hier haben wir Implementationen des Dot-Produkts, der Matrix-Vektor-Multiplikation und Funktionen für die Grundrechenarten auf jedem einzelnen Array-Element hinzugefügt.
+		Mit der Hilfe vieler Mathefunktionen lässt sich der Pseudo-Code Zeile für Zeile in Java übersetzen.
+		Wir wählen $\vec{v}_0 = \vec{f}$ und initialisieren die beiden Arrays $\vec{r}_0$ und $\vec{d}_0$, sowie die Vektornorm $\gamma_0$. Dazu werden Matrix-Vektor-Produkt und andere Mathe-Funktionen verwendet. Den Preconditioner haben wir ebenso in eine Funktion in der Mathe-Klasse ausgelagert.
+		
+		Im Anschluss folgen die Iterationen $k$ des Algorithmus. Der Reihe nach werden gewichtete Schritte in Suchrichtung $\vec{d}$ durchgeführt. Zur Ermittlung des Gewichts $\alpha$ wird ein Vektor $\vec{u}$ zwischenberechnet. Diesen Vektor $\vec{u}$ benötigen wir auch zur Berechnung des Residuums $\vec{r}$.
+		Das Abbruchkriterium erhalten wir aus der Vektornorm $\gamma_k$, ist diese geringer als $10 E^{-7} \times \gamma_0$ so verlassen wir die Schleife.
+		
+		Anstatt das Extremum mittels des Gradienten zu finden, so wechselt dieser Algorithmus zwischen den Iterationen die Richtung in einen konjugierten Vektor.
+		Als letzten Schritt im Code werden die Variablen der aktuellen Iteration für die nächste Iteration neu abgespeichert, neuer Name betitelt sie als "previous".
+	\end{task}	
+
+	\begin{task}{Paralleler PCG-Solver}
+		Aus dem sequentiellen Löser ergibt sich mit ein paar Ergänzungen ein Algorithmus für mehrere MPI-Prozesse.
+		Wir splitten das Netz in der Mitte, sodass die Knoten 1-3 nur auf der linken Seite betrachtet werden und die Knoten 7-9 nur im rechten Netz enthalten sind. Die Knoten dazwischen werden aufgeteilt, die zugehörigen Matrix- und Vektorelemente werden halbiert.
+		Zur Hilfe haben wir Funktionen geschrieben, die das Splitten der Matrix und des Vektors nach den beschriebenen Indizes vornehmen. Teilweise können Variablen nur in einem Prozess geupdatet werden, dies ist der Fall, wenn das Ergebnis additiv verteilt auf die Prozessoren bleibt. Im Fall von $\vec{r}_0$ kann die gleiche Berechnung wie sequentiell gemacht werden.
+		Allerdings gibt es absolut verteilte Werte, wie den Vektor $\vec{d}_0$ und den Skalar $\gamma_0$. Diese müssen nach der lokalen Änderung wieder in allen Prozessen den gleichen Wert erhalten. Dazu werden die Updates aus den beiden Prozessen addiert und in allen Prozessen gespeichert.
+		
+		!!!!!!!!!! KONDITIONIERUNG !!!!!!!!!!
+		
+		In der parallelen Umsetzung der Iterationen ergeben sich auch Updates von absolut verteilten Werten. Diese werden mit den gleichen Funktionen wie zuvor per MPI in allen Prozessen angepasst. Alle Schritte des sequentiellen Algorithmus sind noch vorhanden. Es kommt ein Extraschritt hinzu, weil das Dot-Produkt von $\vec{d}_{k-1}$ und $\vec{u}$ als Zwischenergebnis absolut verteilt ist.
+		
+		Vor dem Abbruchkriterium wird auch eine Reduktion gebraucht.\textit{}
+		
+		Zuletzt brauchen wir auch eine Funktion, welche aus dem gesplitteten Vektor einen Ergebnis-vektor erstellt.
+	\end{task}	
+
+	\begin{task}{Erwartete Ergebnisse}
+		Dank des umschließenden Projekts für die Übung gibt es einfache Optionen, um das Ergebnis zu kontrollieren.
+		Am Ende des Algorithmus, beim Abbruch, werden die Anzahl an Iterationen und der Wert des Abbruchkriteriums ausgegeben.
+		In allen Fällen der Implementation von Conjugate Gradient muss das Ergebnis nach $k = 3$ Iterationen erreicht werden, mit einem $\gamma_3 = 9.200829382756209 E -34$.
+		
+		In der Code-Vorlage werden die Ergebnisvektoren ausgegeben und eine threshold-based-float-comparison gemacht. Dies ist nicht unser Code. Mittels dieser Vergleiche sehen wir, dass sich unsere Ergebnisse nur in der letzten double-Nachkommastelle unterscheiden.
+	\end{task}	
+
+	\begin{task}{Einbindung an vorhandenes Projekt}
+		Wie bereits zuvor geschrieben, haben wir den eigenen Code direkt in die Vorlage an Quellcode eingebaut.
+		Damit wurden direkt die Problemstellungen eingelesen.
+		Die beiden Meshes \textit{9Meshpoints\_1Domain} und \textit{9Meshpoints\_2Domains} können gelöst werden.
+		Allerdings ist unser paralleler Löser nicht für eine andere Anzahl an Knoten im Mesh geeignet.
+		Grund hierfür sind die festgesetzen Zahlen der Überschneidung von Teilmeshes. Unser Löser kann nur damit arbeiten, dass ein Netz die Knoten 1 bis 6 enthält und die andere Hälfte aus den Knoten 4 bis 9 besteht.
+		Um es an eine flexible Größe anpassen zu können, müssen die Splits zwischen den Knoten besser berechnet werden. Dazu müssen wir eine Rechenvorschrift finden, die dann auch z.B. 25 Knoten in zwei Hälften aufteilt. Hierbei ist der Schnitt nicht gerade. In diesem Fall sind 5 oder mehr Knoten in beiden halben Teilnetzen vorhanden.
+		Eine andere Idee ist es, mit mehr als 2 MPI Prozessen die Lösung zu berechnen. Hierbei müssen die Kommunikationen aus einfachem send und receive in richtige reduce und scatter Operationen verändert werden. Auch muss beim Aufteilen des Meshes in 3 Bereiche darauf geachtet werden, dass nicht 3 (oder mehr) aneinander angrenzen. Oder in solche einem Fall sollten die Werte gedrittelt (oder kleiner) werden.
+		
+		Wir verstehen leider kein französisch, um das Datenformat komplett zu verstehen.
+	\end{task}	
 	
 \end{document}
