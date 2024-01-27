@@ -4,8 +4,6 @@ rm -R ./lib/mpj-v0_44
 
 #ml java
 
-./mvn.sh install:install-file -Dfile=lib/mpj-0.44.jar -DgroupId=mpj -DartifactId=mpj -Dversion=0.44 -Dpackaging=jar
-
 ./mvn.sh clean compile
 
 ./mvn.sh clean package
