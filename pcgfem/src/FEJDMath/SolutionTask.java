@@ -31,6 +31,8 @@ class SolutionTask {
     public SolutionTask(Mesh m, int domain) {
         this.m = m;
         this.lastVector = m.getDomain(domain).getLastVector();
+        //for(int i = 0; i < this.lastVector.length; i++)
+        //    System.out.println(this.lastVector[i]);
         this.stiffnessMatrix = m.getDomain(domain).getStiffnessMatrix();
     }
 
