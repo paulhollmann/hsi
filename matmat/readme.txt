@@ -21,3 +21,8 @@ export PATH=$MPJ_HOME/bin:$PATH
 mpjrun.sh -np 4  out/matmat.jar 1
 
 
+
+# to run on own machine
+
+javac -cp .;C:/Dat/Lib/mpj-v0_44/lib/mpj.jar FEM.java
+

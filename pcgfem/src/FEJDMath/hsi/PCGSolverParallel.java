@@ -50,8 +50,8 @@ public class PCGSolverParallel {
         double[] result;
         double[] result_from_other = new double[6];
         result = copy(local_additive_vec);
-        Request req = MPI.COMM_WORLD.Isend(result, 0, 6, MPI.DOUBLE, number + 1 % 2, 43454);
-        MPI.COMM_WORLD.Recv(result_from_other, 0, 6, MPI.DOUBLE, number + 1 % 2, 43454);
+        Request req = MPI.COMM_WORLD.Isend(result, 0, 6, MPI.DOUBLE, (number + 1) % 2, 43454);
+        MPI.COMM_WORLD.Recv(result_from_other, 0, 6, MPI.DOUBLE, (number + 1) % 2, 43454);
         if (number == 0) {
             for (int i = 0; i < 3; i++) {
                 result[i + 3] += result_from_other[i];
@@ -69,8 +69,8 @@ public class PCGSolverParallel {
     public static double get_absolute_scalar(double local_additive_scalar, int number) {
         double[] result = new double[]{local_additive_scalar};
         double[] result_from_other = new double[1];
-        Request req = MPI.COMM_WORLD.Isend(result, 0, 1, MPI.DOUBLE, number + 1 % 2, 43454);
-        MPI.COMM_WORLD.Recv(result_from_other, 0, 1, MPI.DOUBLE, number + 1 % 2, 43454);
+        Request req = MPI.COMM_WORLD.Isend(result, 0, 1, MPI.DOUBLE, (number + 1) % 2, 43454);
+        MPI.COMM_WORLD.Recv(result_from_other, 0, 1, MPI.DOUBLE, (number + 1) % 2, 43454);
         result[0] += result_from_other[0];
         req.Wait();
         return result[0];
@@ -85,7 +85,7 @@ public class PCGSolverParallel {
      */
     public static double[] solve(double[][] K, double[] f) {
 
-        final int rank = 0; //MPI.COMM_WORLD.Rank();
+        final int rank = MPI.COMM_WORLD.Rank();
 
         var K_local = get_K_local(K, rank);
 
