@@ -61,6 +61,21 @@ public class PCGSolverParallel {
         return f_local;
     }
 
+    public static double[] get_v_local(double[] f_global, int number) {
+        assert f_global.length == 9;
+        var f_local = new double[6];
+        if (number == 0) {
+            for (int i = 0; i < 6; i++) {
+                f_local[i] = f_global[i];
+            }
+        } else {
+            for (int i = 0; i < 6; i++) {
+                f_local[i] = f_global[i + 3];
+            }
+        }
+        return f_local;
+    }
+
 
     /**
      * reduce the vector according to  and synchronize the value on all threads
@@ -154,7 +169,7 @@ public class PCGSolverParallel {
         var f_local = get_f_local(f, rank);
 
 
-        var v_k_prev_local = copy(f_local);
+        var v_k_prev_local = get_v_local(f, rank);
 
         var r_k_prev_local = getVectorVectorSub(f_local, getMatVecProd(K_local, v_k_prev_local));
 
