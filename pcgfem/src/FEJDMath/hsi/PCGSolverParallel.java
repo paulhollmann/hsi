@@ -34,13 +34,11 @@ public class PCGSolverParallel {
         var C_inv_local = new double[6];
         if (number == 0) {
             for (int i = 0; i < 6; i++) {
-                double couplingfactor = i > 3 ? 0.5 : 1;
-                C_inv_local[i] = couplingfactor * 1.0 / K_global[i][i];
+                C_inv_local[i] = 1.0 / K_global[i][i];
             }
         } else {
             for (int i = 0; i < 6; i++) {
-                double couplingfactor = i + 3 < 6 ? 0.5 : 1;
-                C_inv_local[i] = couplingfactor * 1.0 / K_global[i + 3][i + 3];
+                C_inv_local[i] = 1.0 / K_global[i + 3][i + 3];
             }
         }
         return C_inv_local;
