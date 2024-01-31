@@ -42,7 +42,7 @@ subtask=ruled %or plain
 	In dieser Übung soll ein Gleichungslöser mit dem preconditioned Conjugate-Gradient-Approach umgesetzt werden.
 
 	\begin{task}{Sequentieller PCG-Solver}
-		Wir haben direkt in der Code-Vorlage angefangen zu programmieren. Die Vorlage hat das Einlesen unterschiedlicher FEM-Netze erlaubt. Das erste Beispiel entspricht direkt der Übung.
+		Die Vorlage erlaubt das Einlesen unterschiedlicher FEM-Netze. Das erste Beispiel entspricht direkt der Übung.
 		Den sequentielle Solver haben wir direkt nach dem Pseudo-Code Algorithmus programmiert. Zur Hilfe wurden in $\mathtt{MathOperations.java}$ einige Hilfsfunktionen geschrieben. Hier haben wir Implementationen des Dot-Produkts, der Matrix-Vektor-Multiplikation und Funktionen für die Grundrechenarten auf jedem einzelnen Array-Element hinzugefügt.
 		Mit der Hilfe vieler Mathefunktionen lässt sich der Pseudo-Code Zeile für Zeile in Java übersetzen.
 		Wir wählen $\vec{v}_0 = \vec{f}$ und initialisieren die beiden Arrays $\vec{r}_0$ und $\vec{d}_0$, sowie die Vektornorm $\gamma_0$. Dazu werden Matrix-Vektor-Produkt und andere Mathe-Funktionen verwendet. Den Preconditioner haben wir ebenso in eine Funktion in der Mathe-Klasse ausgelagert.
@@ -74,7 +74,7 @@ subtask=ruled %or plain
 		Am Ende des Algorithmus, beim Abbruch, werden die Anzahl an Iterationen und der Wert des Abbruchkriteriums ausgegeben.
 		In allen Fällen der Implementation von Conjugate Gradient muss das Ergebnis nach $k = 3$ Iterationen erreicht werden, mit einem $\gamma_3 = 9.200829382756209 E -34$.
 		
-		In der Code-Vorlage werden die Ergebnisvektoren ausgegeben und eine threshold-based-float-comparison gemacht. Dies ist nicht unser Code. Mittels dieser Vergleiche sehen wir, dass sich unsere Ergebnisse nur in der letzten double-Nachkommastelle unterscheiden.
+		In der Code-Vorlage werden die Ergebnisvektoren ausgegeben und eine threshold-based-float-comparison gemacht. Mittels dieser Vergleiche sehen wir, dass sich unsere Ergebnisse nur in der letzten double-Nachkommastelle unterscheiden.
 	\end{task}	
 
 	\begin{task}{Einbindung an vorhandenes Projekt}
