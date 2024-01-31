@@ -60,11 +60,11 @@ subtask=ruled %or plain
 		Zur Hilfe haben wir Funktionen geschrieben, die das Splitten der Matrix und des Vektors nach den beschriebenen Indizes vornehmen. Teilweise können Variablen nur in einem Prozess geupdatet werden, dies ist der Fall, wenn das Ergebnis additiv verteilt auf die Prozessoren bleibt. Im Fall von $\vec{r}_0$ kann die gleiche Berechnung wie sequentiell gemacht werden.
 		Allerdings gibt es absolut verteilte Werte, wie den Vektor $\vec{d}_0$ und den Skalar $\gamma_0$. Diese müssen nach der lokalen Änderung wieder in allen Prozessen den gleichen Wert erhalten. Dazu werden die Updates aus den beiden Prozessen addiert und in allen Prozessen gespeichert.
 		
-		!!!!!!!!!! KONDITIONIERUNG !!!!!!!!!!
+		In unserer Implementierung ist die Jacobi-Konditionierungsmatrix ebenfalls eine absolute verteilte Matrix. Daher bestimmen wir einmal zu Beginn des Programms die inversen Diagonalelemente und setzen diese auf die Diagonale einer Matrix C.
 		
 		In der parallelen Umsetzung der Iterationen ergeben sich auch Updates von absolut verteilten Werten. Diese werden mit den gleichen Funktionen wie zuvor per MPI in allen Prozessen angepasst. Alle Schritte des sequentiellen Algorithmus sind noch vorhanden. Es kommt ein Extraschritt hinzu, weil das Dot-Produkt von $\vec{d}_{k-1}$ und $\vec{u}$ als Zwischenergebnis absolut verteilt ist.
 		
-		Vor dem Abbruchkriterium wird auch eine Reduktion gebraucht.\textit{}
+		Vor dem Abbruchkriterium wird auch eine Reduktion gebraucht.
 		
 		Zuletzt brauchen wir auch eine Funktion, welche aus dem gesplitteten Vektor einen Ergebnis-vektor erstellt.
 	\end{task}	
