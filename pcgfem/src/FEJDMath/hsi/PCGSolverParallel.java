@@ -29,6 +29,23 @@ public class PCGSolverParallel {
         return K_local;
     }
 
+    public static double[] get_C_inv_local(double[][] K_global, int number) {
+        assert K_global.length == 9;
+        var C_inv_local = new double[6];
+        if (number == 0) {
+            for (int i = 0; i < 6; i++) {
+                double couplingfactor = i > 3 ? 0.5 : 1;
+                C_inv_local[i] = couplingfactor * K_global[i][i];
+            }
+        } else {
+            for (int i = 0; i < 6; i++) {
+                double couplingfactor = i + 3 < 6 ? 0.5 : 1;
+                C_inv_local[i] = couplingfactor * K_global[i + 3][i + 3];
+            }
+        }
+        return C_inv_local;
+    }
+
     public static double[] get_f_local(double[] f_global, int number) {
         assert f_global.length == 9;
         var f_local = new double[6];
@@ -45,6 +62,7 @@ public class PCGSolverParallel {
         }
         return f_local;
     }
+
 
     /**
      * reduce the vector according to  and synchronize the value on all threads
@@ -142,8 +160,9 @@ public class PCGSolverParallel {
 
         var r_k_prev_local = getVectorVectorSub(f_local, getMatVecProd(K_local, v_k_prev_local));
 
-        //var C_inv  = getInvJacobiPreconditioner(K);
-        var d_k_prev_local = get_absolute_vec(r_k_prev_local, rank); // NOT PRECONDITIONED
+        var C_inv_local = get_C_inv_local(K, rank);
+
+        var d_k_prev_local = get_absolute_vec(getVectorVectorProduct(C_inv_local, r_k_prev_local), rank); // PRECONDITIONED
 
         var gamma_k_prev_local = get_absolute_scalar(getDotProd(d_k_prev_local, r_k_prev_local), rank);
 
@@ -164,7 +183,7 @@ public class PCGSolverParallel {
 
             r_k = getVectorVectorSub(r_k_prev_local, getScalarVectorMul(alpha, u));
 
-            var p = r_k; // Precond
+            var p = getVectorVectorProduct(C_inv_local, r_k); // Precond
 
             p = get_absolute_vec(p, rank);
 
